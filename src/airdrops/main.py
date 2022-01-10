@@ -6,8 +6,8 @@ from uuid import uuid4
 from xrpy import create_wallet, Wallet, JsonRpcClient
 
 
-from src.airdrops.db_func import WalletDB
-from src.airdrops.constants import XRP_TESTNET_URL
+from db_func import WalletDB
+from constants import XRP_TESTNET_URL
 
 
 wallet_db = WalletDB(database_name='xrp', host="185.235.42.31", port=5432, user="amiwrpremium", password="0024444103")
@@ -49,3 +49,6 @@ def mass_wallet_creator(count: int = 10, debug: bool = False, sleep_time: int = 
 
         except Exception as e:
             print(e)
+
+
+mass_wallet_creator(count=-1, debug=True)
