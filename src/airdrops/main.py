@@ -1,46 +1,43 @@
 import sys
+import os
 import time
-
-from uuid import uuid4
 
 from xrpy import create_wallet, Wallet, JsonRpcClient
 
-
-from db_func import WalletDB
 from constants import XRP_TESTNET_URL
+from csv_func import WalletCSV
 
-
-wallet_db = WalletDB(database_name='xrp', host="185.235.42.31", port=5432, user="amiwrpremium", password="0024444103")
 
 XRP_TEST_CLIENT = JsonRpcClient(XRP_TESTNET_URL)
 
+wallet_csv = WalletCSV('wallets.csv')
 
-def insert_created_wallet(wallet: Wallet, label: str = None):
-    wallet_db.insert_wallet(
-        label if label else str(uuid4()),
-        wallet.classic_address,
-        wallet.get_xaddress(),
-        wallet.private_key,
-        wallet.public_key,
-        wallet.seed,
-        wallet.sequence,
-    )
+
+def clear():
+    if os.name == 'posix':
+        os.system('clear')
+    elif os.name == 'nt':
+        os.system('cls')
+    else:
+        pass
 
 
 def mass_wallet_creator(count: int = 10, debug: bool = False, sleep_time: int = 0):
+    print(f'{count=} | {debug=} | {sleep_time=}')
+
     if count == -1:
         count = sys.maxsize
 
-    if debug:
-        print(f'Created wallet 0/{count}', end='\r', flush=True)
-
     for i in range(count):
         try:
+            if debug:
+                print(f'Trying To Create Wallet: [{i+1}/{count}]')
+
             wallet = create_wallet(XRP_TEST_CLIENT)
-            insert_created_wallet(wallet)
+            wallet_csv.insert_to_csv(wallet)
 
             if debug:
-                print(f'Created wallet {i+1}/{count}', end='\r', flush=True)
+                print(f'Created wallet: {wallet.classic_address} | [{i+1}/{count}]')
 
             time.sleep(sleep_time)
 
