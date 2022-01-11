@@ -48,4 +48,30 @@ def mass_wallet_creator(count: int = 10, debug: bool = False, sleep_time: int = 
             print(e)
 
 
-mass_wallet_creator(count=-1, debug=True)
+def enter():
+    count = int(input('Enter count: '))
+
+    if count < -1 or count == 0:
+        sys.exit('Invalid count')
+
+    sleep_time = int(input('Enter sleep time: '))
+
+    if sleep_time < 0:
+        sys.exit('Invalid sleep time')
+
+    _debug = input('Debug? (y/n): ') or 'y'
+
+    if _debug.lower() == 'y':
+        debug = True
+    elif _debug.lower() == 'n':
+        debug = False
+    else:
+        sys.exit('Invalid debug')
+
+    clear()
+
+    mass_wallet_creator(count, debug, sleep_time)
+
+
+if __name__ == '__main__':
+    enter()
