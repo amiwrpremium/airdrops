@@ -2,6 +2,8 @@ import sys
 import os
 import time
 
+from datetime import datetime
+
 from xrpy import create_wallet, Wallet, JsonRpcClient
 
 from constants import XRP_TESTNET_URL
@@ -10,7 +12,7 @@ from csv_func import WalletCSV
 
 XRP_TEST_CLIENT = JsonRpcClient(XRP_TESTNET_URL)
 
-wallet_csv = WalletCSV('wallets.csv')
+wallet_csv = WalletCSV(f'wallets-{str(datetime.utcnow())}.csv')
 
 
 def clear():
@@ -35,7 +37,7 @@ def mass_wallet_creator(count: int = 10, debug: bool = False, sleep_time: int = 
 
             wallet = create_wallet(XRP_TEST_CLIENT)
 
-            if wallet:
+            if wallet and type(wallet) == Wallet:
                 try:
                     if debug:
                         print(f'Trying To Add to CSV: [{i + 1}/{count}]')
