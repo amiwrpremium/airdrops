@@ -2,7 +2,7 @@ import sys
 import os
 import time
 
-from datetime import datetime
+from uuid import uuid4
 
 from xrpy import create_wallet, Wallet, JsonRpcClient
 
@@ -12,7 +12,7 @@ from csv_func import WalletCSV
 
 XRP_TEST_CLIENT = JsonRpcClient(XRP_TESTNET_URL)
 
-wallet_csv = WalletCSV(f'wallets-{str(datetime.now().strftime("%m/%d/%Y-%H:%M:%S"))}.csv')
+wallet_csv = WalletCSV(f'wallets-{str(uuid4())}.csv')
 
 
 def clear():
