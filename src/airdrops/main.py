@@ -35,18 +35,23 @@ def mass_wallet_creator(count: int = 10, debug: bool = False, sleep_time: int = 
 
             wallet = create_wallet(XRP_TEST_CLIENT)
 
-            try:
+            if wallet:
+                try:
+                    if debug:
+                        print(f'Trying To Add to CSV: [{i + 1}/{count}]')
+
+                    wallet_csv.insert_to_csv(wallet)
+                except Exception as e:
+                    print(e)
+
                 if debug:
-                    print(f'Trying To Add to CSV: [{i + 1}/{count}]')
+                    print(f'Created wallet: {wallet.classic_address} | [{i+1}/{count}]')
 
-                wallet_csv.insert_to_csv(wallet)
-            except Exception as e:
-                print(e)
+                time.sleep(sleep_time)
 
-            if debug:
-                print(f'Created wallet: {wallet.classic_address} | [{i+1}/{count}]')
-
-            time.sleep(sleep_time)
+            else:
+                if debug:
+                    print(f'Failed to create wallet: {wallet=} | {type(wallet)=}')
 
         except KeyboardInterrupt:
             return
