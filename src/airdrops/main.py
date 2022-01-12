@@ -12,7 +12,7 @@ from csv_func import WalletCSV
 
 XRP_TEST_CLIENT = JsonRpcClient(XRP_TESTNET_URL)
 
-wallet_csv = WalletCSV(f'wallets-{str(datetime.utcnow())}.csv')
+wallet_csv = WalletCSV(f'wallets-{str(datetime.now().strftime("%m/%d/%Y-%H:%M:%S"))}.csv')
 
 
 def clear():
