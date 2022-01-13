@@ -10,8 +10,14 @@ class WalletCSV:
         self.headers = [
             'date', 'label', 'classic_address', 'x_address', 'private_key', 'public_key', 'seed', 'sequence'
         ]
-
-        self.write_headers()
+        self.date_index = 0
+        self.label_index = 1
+        self.classic_address_index = 2
+        self.x_address_index = 3
+        self.private_key_index = 4
+        self.public_key_index = 5
+        self.seed_index = 6
+        self.sequence_index = 7
 
     def write_headers(self):
         with open(self.csv_file, 'w', encoding='UTF8', newline='') as f:
@@ -33,3 +39,8 @@ class WalletCSV:
                     wallet.sequence
                 ]
             )
+
+    def get_all_csv_info(self):
+        with open(self.csv_file, 'r', encoding='UTF8') as csvfile:
+            reader = csv.reader(csvfile)
+            return list(reader)

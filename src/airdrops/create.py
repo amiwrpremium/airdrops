@@ -13,6 +13,7 @@ from csv_func import WalletCSV
 XRP_TEST_CLIENT = JsonRpcClient(XRP_TESTNET_URL)
 
 wallet_csv = WalletCSV(f'wallets-{str(uuid4())}.csv')
+wallet_csv.write_headers()
 
 
 def clear():
