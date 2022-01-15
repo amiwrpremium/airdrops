@@ -9,9 +9,11 @@ from xrpy import Wallet, JsonRpcClient, create_offer_buy, create_offer_sell
 
 from constants import XRPL_FOUNDATION
 from csv_func import WalletCSV
+from utils import Report
 
 
 XRP_MAIN_CLIENT = JsonRpcClient(XRPL_FOUNDATION)
+report = Report()
 
 
 def clear():
@@ -59,12 +61,23 @@ def mass_create_order_buy(path_to_csv: str, taker_gets_xrp: Union[int, float], t
                 'market'
             )
 
-            if debug:
-                print(f'Status: {_create_offer.result.get("meta").get("TransactionResult")}')
+            if _create_offer and (_create_offer.result.get("meta").get("TransactionResult")) == 'tesSUCCESS':
+                report.add_success()
 
-            time.sleep(sleep_time)
+                if debug:
+                    print(f'Status: {_create_offer.result.get("meta").get("TransactionResult")}')
+
+                time.sleep(sleep_time)
+
+            else:
+                report.add_failed()
+                if debug:
+                    print(f'Failed: [Unknown Error]')
+
+                continue
 
         except Exception as e:
+            report.add_failed()
             print(f'Error: {e}')
             continue
 
@@ -105,12 +118,22 @@ def mass_create_order_sell(path_to_csv: str, taker_pays_xrp: Union[int, float], 
                 'market'
             )
 
-            if debug:
-                print(f'Status: {_create_offer.result.get("meta").get("TransactionResult")}')
+            if _create_offer and (_create_offer.result.get("meta").get("TransactionResult")) == 'tesSUCCESS':
+                report.add_success()
 
-            time.sleep(sleep_time)
+                if debug:
+                    print(f'Status: {_create_offer.result.get("meta").get("TransactionResult")}')
+
+                time.sleep(sleep_time)
+
+            else:
+                report.add_failed()
+                if debug:
+                    print(f'Failed: [Unknown Error]')
+                continue
 
         except Exception as e:
+            report.add_failed()
             print(f'Error: {e}')
             continue
 
@@ -147,6 +170,8 @@ def enter():
         taker_pays_value = input('Enter taker pays value: ')
         taker_pays_issuer = input('Enter taker pays issuer: ')
 
+        clear()
+
         mass_create_order_buy(
             path_to_csv,
             taker_gets_xrp,
@@ -168,6 +193,8 @@ def enter():
         taker_gets_value = input('Enter taker gets value: ')
         taker_gets_issuer = input('Enter taker gets issuer: ')
 
+        clear()
+
         mass_create_order_sell(
             path_to_csv,
             taker_pays_xrp,
@@ -178,10 +205,12 @@ def enter():
             sleep_time,
             debug
         )
+
+        print('\n\n')
+        print(report.get_report())
+
     else:
         sys.exit('Invalid side')
-
-    clear()
 
 
 if __name__ == '__main__':

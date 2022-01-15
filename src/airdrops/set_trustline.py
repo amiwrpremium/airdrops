@@ -7,9 +7,11 @@ from xrpy import Wallet, JsonRpcClient, set_trust_line
 
 from constants import XRPL_FOUNDATION
 from csv_func import WalletCSV
+from utils import Report
 
 
 XRP_MAIN_CLIENT = JsonRpcClient(XRPL_FOUNDATION)
+report = Report()
 
 
 def clear():
@@ -36,12 +38,26 @@ def mass_trust_line(path_to_csv: str, currency: str, value: int, issuer: str, sl
 
         wallet = Wallet(data[wallet_csv.seed_index], data[wallet_csv.sequence_index])
 
-        _trust_line = set_trust_line(XRP_MAIN_CLIENT, wallet, currency, str(value), issuer)
+        try:
+            _trust_line = set_trust_line(XRP_MAIN_CLIENT, wallet, currency, str(value), issuer)
 
-        if debug:
-            print(f'Status: {_trust_line.result.get("meta").get("TransactionResult")}')
+            if _trust_line and (_trust_line.result.get("meta").get("TransactionResult")) == 'tesSUCCESS':
+                report.add_success()
 
-        time.sleep(sleep_time)
+                if debug:
+                    print(_trust_line.result.get("meta").get("TransactionResult"))
+
+                time.sleep(sleep_time)
+            else:
+                report.add_failed()
+                if debug:
+                    print(f'Failed: [Unknown Error]')
+                continue
+
+        except Exception as e:
+            report.add_failed()
+            print(f'{e}')
+            continue
 
 
 def enter():
@@ -76,6 +92,9 @@ def enter():
     clear()
 
     mass_trust_line(path_to_csv, currency, value, issuer, sleep_time, debug)
+
+    print('\n\n')
+    print(report.get_report())
 
 
 if __name__ == '__main__':

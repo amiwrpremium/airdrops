@@ -8,12 +8,14 @@ from xrpy import create_wallet, Wallet, JsonRpcClient
 
 from constants import XRP_TESTNET_URL
 from csv_func import WalletCSV
+from utils import Report
 
 
 XRP_TEST_CLIENT = JsonRpcClient(XRP_TESTNET_URL)
 
 wallet_csv = WalletCSV(f'wallets-{str(uuid4())}.csv')
 wallet_csv.write_headers()
+report = Report()
 
 
 def clear():
@@ -39,6 +41,7 @@ def mass_wallet_creator(count: int = 10, debug: bool = False, sleep_time: int = 
             wallet = create_wallet(XRP_TEST_CLIENT)
 
             if wallet and type(wallet) == Wallet:
+                report.add_success()
                 try:
                     if debug:
                         print(f'Trying To Add to CSV: [{i + 1}/{count}]')
@@ -53,6 +56,7 @@ def mass_wallet_creator(count: int = 10, debug: bool = False, sleep_time: int = 
                 time.sleep(sleep_time)
 
             else:
+                report.add_failed()
                 if debug:
                     print(f'Failed to create wallet: {wallet=} | {type(wallet)=}')
 
@@ -60,7 +64,9 @@ def mass_wallet_creator(count: int = 10, debug: bool = False, sleep_time: int = 
             return
 
         except Exception as e:
-            print(e)
+            report.add_failed()
+            print(f'{e}')
+            continue
 
 
 def enter():
@@ -86,6 +92,9 @@ def enter():
     clear()
 
     mass_wallet_creator(count, debug, sleep_time)
+
+    print('\n\n')
+    print(report.get_report())
 
 
 if __name__ == '__main__':
