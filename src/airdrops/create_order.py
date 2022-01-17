@@ -2,6 +2,9 @@ import sys
 import os
 import time
 
+import argparse
+import traceback
+
 from typing import Union
 
 from colorama import init as colorama_init
@@ -13,6 +16,12 @@ from xrpy import Wallet, JsonRpcClient, create_offer_buy, create_offer_sell, get
 from constants import XRPL_FOUNDATION
 from csv_func import WalletCSV
 from utils import Report
+
+
+parser = argparse.ArgumentParser(description='Set trustline for airdrop wallets')
+parser.add_argument('--debug', '-D', dest='debug', help='Debug mode', action='store_true')
+args = parser.parse_args()
+debug = True if args.debug else False
 
 
 colorama_init()
@@ -101,6 +110,8 @@ def mass_create_order_buy(path_to_csv: str, taker_gets_xrp: Union[int, float], t
         except Exception as e:
             report.add_failed()
             print(colored(text=f'Error: {e}', color='red'))
+            if debug:
+                print(colored(text=f'Traceback: {traceback.format_exc()}', color='red'))
             continue
 
 
@@ -134,8 +145,10 @@ def mass_create_order_sell(path_to_csv: str, taker_pays_xrp: Union[int, float], 
         try:
             balance = get_trustline_balance(XRP_MAIN_CLIENT, wallet.classic_address, taker_gets_currency)
         except Exception as e:
-            print(colored(text=f'Error: {e}', color='red'))
             report.add_failed()
+            print(colored(text=f'Error: {e}', color='red'))
+            if debug:
+                print(colored(text=f'Traceback: {traceback.format_exc()}', color='red'))
             continue
 
         try:
@@ -172,10 +185,15 @@ def mass_create_order_sell(path_to_csv: str, taker_pays_xrp: Union[int, float], 
         except Exception as e:
             report.add_failed()
             print(colored(text=f'Error: {e}', color='red'))
+            if debug:
+                print(colored(text=f'Traceback: {traceback.format_exc()}', color='red'))
             continue
 
 
 def enter():
+    if debug:
+        print(colored(text=f'DEBUG MODE\n\n', color='red', attrs=['blink', 'bold']))
+
     path_to_csv = input('Enter path to csv file: ')
 
     side = input('Enter side (buy/sell): ')
@@ -240,4 +258,5 @@ def enter():
 
 
 if __name__ == '__main__':
+    clear()
     enter()

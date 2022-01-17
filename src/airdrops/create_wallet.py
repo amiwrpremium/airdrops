@@ -2,6 +2,9 @@ import sys
 import os
 import time
 
+import argparse
+import traceback
+
 from uuid import uuid4
 
 from colorama import init as colorama_init
@@ -12,6 +15,12 @@ from xrpy import create_wallet, Wallet, JsonRpcClient
 from constants import XRP_TESTNET_URL
 from csv_func import WalletCSV
 from utils import Report
+
+
+parser = argparse.ArgumentParser(description='Set trustline for airdrop wallets')
+parser.add_argument('--debug', '-D', dest='debug', help='Debug mode', action='store_true')
+args = parser.parse_args()
+debug = True if args.debug else False
 
 
 colorama_init()
@@ -63,10 +72,15 @@ def mass_wallet_creator(count: int = 10, sleep_time: int = 0):
         except Exception as e:
             report.add_failed()
             print(colored(f'Error: {e}', color='red'))
+            if debug:
+                print(colored(text=f'Traceback: {traceback.format_exc()}', color='red'))
             continue
 
 
 def enter():
+    if debug:
+        print(colored(text=f'DEBUG MODE\n\n', color='red', attrs=['blink', 'bold']))
+
     count = int(input('Enter count: '))
 
     if count < -1 or count == 0:
@@ -86,4 +100,5 @@ def enter():
 
 
 if __name__ == '__main__':
+    clear()
     enter()

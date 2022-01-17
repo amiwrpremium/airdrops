@@ -2,6 +2,9 @@ import sys
 import os
 import time
 
+import argparse
+import traceback
+
 from colorama import init as colorama_init
 from termcolor import colored
 
@@ -10,6 +13,12 @@ from xrpy import Wallet, JsonRpcClient, set_trust_line
 from constants import XRPL_FOUNDATION
 from csv_func import WalletCSV
 from utils import Report
+
+
+parser = argparse.ArgumentParser(description='Set trustline for airdrop wallets')
+parser.add_argument('--debug', '-D', dest='debug', help='Debug mode', action='store_true')
+args = parser.parse_args()
+debug = True if args.debug else False
 
 
 colorama_init()
@@ -65,10 +74,15 @@ def mass_trust_line(path_to_csv: str, currency: str, value: int, issuer: str, sl
         except Exception as e:
             report.add_failed()
             print(colored(text=f'Error: {e}', color='red'))
+            if debug:
+                print(colored(text=f'Traceback: {traceback.format_exc()}', color='red'))
             continue
 
 
 def enter():
+    if debug:
+        print(colored(text=f'DEBUG MODE\n\n', color='red', attrs=['blink', 'bold']))
+
     path_to_csv = input('Enter path to csv file: ')
 
     currency = input('Enter currency: ')
@@ -97,4 +111,5 @@ def enter():
 
 
 if __name__ == '__main__':
+    clear()
     enter()
