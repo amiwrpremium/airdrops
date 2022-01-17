@@ -31,10 +31,10 @@ def clear():
         pass
 
 
-def mass_wallet_creator(count: int = 10, debug: bool = False, sleep_time: int = 0):
+def mass_wallet_creator(count: int = 10, sleep_time: int = 0):
     print(
         colored(
-            text=f"{count=} | {debug=} | {sleep_time=}",
+            text=f"{count=} | {sleep_time=}",
             color='cyan'
         )
     )
@@ -44,8 +44,7 @@ def mass_wallet_creator(count: int = 10, debug: bool = False, sleep_time: int = 
 
     for i in range(count):
         try:
-            if debug:
-                print(colored(text=f'Trying To Create Wallet: [{i+1}/{count}]', color='yellow'))
+            print(colored(text=f'Trying To Create Wallet: [{i+1}/{count}]', color='yellow'))
 
             wallet = create_wallet(XRP_TEST_CLIENT)
 
@@ -53,22 +52,17 @@ def mass_wallet_creator(count: int = 10, debug: bool = False, sleep_time: int = 
                 report.add_success()
                 wallet_csv.insert_to_csv(wallet)
 
-                if debug:
-                    print(colored(f'Created wallet: {wallet.classic_address} | [{i+1}/{count}]', color='green'))
+                print(colored(f'Created wallet: {wallet.classic_address} | [{i+1}/{count}]', color='green'))
 
                 time.sleep(sleep_time)
 
             else:
                 report.add_failed()
-                if debug:
-                    print(colored(f'Failed to create wallet: {wallet=} | {type(wallet)=}', color='red'))
-
-        except KeyboardInterrupt:
-            return
+                print(colored(f'Failed to create wallet: {wallet=} | {type(wallet)=}', color='red'))
 
         except Exception as e:
             report.add_failed()
-            print(colored(f'{e}', color='red'))
+            print(colored(f'Error: {e}', color='red'))
             continue
 
 
@@ -83,18 +77,9 @@ def enter():
     if sleep_time < 0:
         sys.exit('Invalid sleep time')
 
-    _debug = input('Debug? (y/n): ') or 'y'
-
-    if _debug.lower() == 'y':
-        debug = True
-    elif _debug.lower() == 'n':
-        debug = False
-    else:
-        sys.exit('Invalid debug')
-
     clear()
 
-    mass_wallet_creator(count, debug, sleep_time)
+    mass_wallet_creator(count, sleep_time)
 
     print('\n\n')
     print(report.get_report())

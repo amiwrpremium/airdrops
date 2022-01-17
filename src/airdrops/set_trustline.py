@@ -26,10 +26,10 @@ def clear():
         pass
 
 
-def mass_trust_line(path_to_csv: str, currency: str, value: int, issuer: str, sleep_time: int = 0, debug: bool = False):
+def mass_trust_line(path_to_csv: str, currency: str, value: int, issuer: str, sleep_time: int = 0):
     print(
         colored(
-            text=f'{path_to_csv=} | {currency=} | {value=} | {issuer=} | {debug=}',
+            text=f'{path_to_csv=} | {currency=} | {value=} | {issuer=}',
             color='cyan'
         )
     )
@@ -37,12 +37,10 @@ def mass_trust_line(path_to_csv: str, currency: str, value: int, issuer: str, sl
     wallet_csv = WalletCSV(path_to_csv)
     wallet_data = wallet_csv.get_all_csv_info()[1:]
 
-    if debug:
-        print(colored(text=f'{len(wallet_data)} wallets imported\n\n', color='magenta'))
+    print(colored(text=f'{len(wallet_data)} wallets imported\n\n', color='magenta'))
 
     for data in wallet_data:
-        if debug:
-            print(colored(text=f'{data}', color='yellow'))
+        print(colored(text=f'{data}', color='yellow'))
 
         wallet = Wallet(data[wallet_csv.seed_index], data[wallet_csv.sequence_index])
 
@@ -52,17 +50,15 @@ def mass_trust_line(path_to_csv: str, currency: str, value: int, issuer: str, sl
             if _trust_line and (_trust_line.result.get("meta").get("TransactionResult")) == 'tesSUCCESS':
                 report.add_success()
 
-                if debug:
-                    print(colored(
-                        text=f'Status: Success',
-                        color='green'
-                    ))
+                print(colored(
+                    text=f'Status: Success',
+                    color='green'
+                ))
 
                 time.sleep(sleep_time)
             else:
                 report.add_failed()
-                if debug:
-                    print(colored(text=f'Failed: [Unknown Error]', color='red'))
+                print(colored(text=f'Failed: [Unknown Error]', color='red'))
                 continue
 
         except Exception as e:
@@ -91,18 +87,9 @@ def enter():
     if sleep_time < 0:
         sys.exit('Invalid sleep time')
 
-    _debug = input('Debug? (y/n): ') or 'y'
-
-    if _debug.lower() == 'y':
-        debug = True
-    elif _debug.lower() == 'n':
-        debug = False
-    else:
-        sys.exit('Invalid debug')
-
     clear()
 
-    mass_trust_line(path_to_csv, currency, value, issuer, sleep_time, debug)
+    mass_trust_line(path_to_csv, currency, value, issuer, sleep_time)
 
     print('\n\n')
     print(report.get_report())
