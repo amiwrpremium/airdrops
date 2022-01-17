@@ -8,7 +8,7 @@ import traceback
 from colorama import init as colorama_init
 from termcolor import colored
 
-from xrpy import Wallet, JsonRpcClient, set_trust_line
+from xrpy import Wallet, JsonRpcClient, set_trust_line, get_account_trustlines
 
 from constants import XRPL_FOUNDATION
 from csv_func import WalletCSV
@@ -35,6 +35,19 @@ def clear():
         pass
 
 
+def is_trustline_set(client: JsonRpcClient, address: str, currency: str) -> bool:
+    all_trust_lines = get_account_trustlines(client, address)
+    lines = all_trust_lines.result.get('lines')
+
+    for line in lines:
+        if line.get('currency') == currency:
+            return True
+        else:
+            continue
+
+    return False
+
+
 def mass_trust_line(path_to_csv: str, currency: str, value: int, issuer: str, sleep_time: int = 0):
     print(
         colored(
@@ -53,29 +66,34 @@ def mass_trust_line(path_to_csv: str, currency: str, value: int, issuer: str, sl
 
         wallet = Wallet(data[wallet_csv.seed_index], data[wallet_csv.sequence_index])
 
-        try:
-            _trust_line = set_trust_line(XRP_MAIN_CLIENT, wallet, currency, str(value), issuer)
-            result = _trust_line.result.get("meta").get("TransactionResult")
+        if is_trustline_set(client=XRP_MAIN_CLIENT, address=wallet.address, currency=currency):
+            try:
+                _trust_line = set_trust_line(XRP_MAIN_CLIENT, wallet, currency, str(value), issuer)
+                result = _trust_line.result.get("meta").get("TransactionResult")
 
-            if _trust_line and result == 'tesSUCCESS':
-                report.add_success()
+                if _trust_line and result == 'tesSUCCESS':
+                    report.add_success()
 
-                print(colored(
-                    text=f'Status: Success',
-                    color='green'
-                ))
+                    print(colored(
+                        text=f'Status: Success',
+                        color='green'
+                    ))
 
-                time.sleep(sleep_time)
-            else:
+                    time.sleep(sleep_time)
+                else:
+                    report.add_failed()
+                    print(colored(text=f'Failed: [Unknown Error] | [{result}]', color='red'))
+                    continue
+
+            except Exception as e:
                 report.add_failed()
-                print(colored(text=f'Failed: [Unknown Error] | [{result}]', color='red'))
+                print(colored(text=f'Error: {e}', color='red'))
+                if debug:
+                    print(colored(text=f'Traceback: {traceback.format_exc()}', color='red'))
                 continue
-
-        except Exception as e:
+        else:
             report.add_failed()
-            print(colored(text=f'Error: {e}', color='red'))
-            if debug:
-                print(colored(text=f'Traceback: {traceback.format_exc()}', color='red'))
+            print(colored(text=f'Failed: [Trustline already set]', color='red'))
             continue
 
 
