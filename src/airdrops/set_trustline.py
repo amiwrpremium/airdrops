@@ -66,7 +66,7 @@ def mass_trust_line(path_to_csv: str, currency: str, value: int, issuer: str, sl
 
         wallet = Wallet(data[wallet_csv.seed_index], data[wallet_csv.sequence_index])
 
-        if is_trustline_set(client=XRP_MAIN_CLIENT, address=wallet.address, currency=currency):
+        if is_trustline_set(client=XRP_MAIN_CLIENT, address=wallet.classic_address, currency=currency):
             try:
                 _trust_line = set_trust_line(XRP_MAIN_CLIENT, wallet, currency, str(value), issuer)
                 result = _trust_line.result.get("meta").get("TransactionResult")
