@@ -80,7 +80,9 @@ def mass_create_order_buy(path_to_csv: str, taker_gets_xrp: Union[int, float], t
                 'market'
             )
 
-            if _create_offer and (_create_offer.result.get("meta").get("TransactionResult")) == 'tesSUCCESS':
+            result = _create_offer.result.get("meta").get("TransactionResult")
+
+            if _create_offer and result == 'tesSUCCESS':
                 report.add_success()
 
                 print(colored(
@@ -92,7 +94,7 @@ def mass_create_order_buy(path_to_csv: str, taker_gets_xrp: Union[int, float], t
 
             else:
                 report.add_failed()
-                print(colored(text=f'Failed: [Unknown Error]', color='red'))
+                print(colored(text=f'Failed: [Unknown Error] | [{result}]', color='red'))
 
                 continue
 

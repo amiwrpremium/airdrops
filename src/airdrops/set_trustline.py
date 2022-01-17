@@ -46,8 +46,9 @@ def mass_trust_line(path_to_csv: str, currency: str, value: int, issuer: str, sl
 
         try:
             _trust_line = set_trust_line(XRP_MAIN_CLIENT, wallet, currency, str(value), issuer)
+            result = _trust_line.result.get("meta").get("TransactionResult")
 
-            if _trust_line and (_trust_line.result.get("meta").get("TransactionResult")) == 'tesSUCCESS':
+            if _trust_line and result == 'tesSUCCESS':
                 report.add_success()
 
                 print(colored(
@@ -58,7 +59,7 @@ def mass_trust_line(path_to_csv: str, currency: str, value: int, issuer: str, sl
                 time.sleep(sleep_time)
             else:
                 report.add_failed()
-                print(colored(text=f'Failed: [Unknown Error]', color='red'))
+                print(colored(text=f'Failed: [Unknown Error] | [{result}]', color='red'))
                 continue
 
         except Exception as e:
