@@ -5,7 +5,7 @@ import time
 from typing import Union
 
 
-from xrpy import Wallet, JsonRpcClient, create_offer_buy, create_offer_sell
+from xrpy import Wallet, JsonRpcClient, create_offer_buy, create_offer_sell, get_account_trustlines
 
 from constants import XRPL_FOUNDATION
 from csv_func import WalletCSV
@@ -23,6 +23,19 @@ def clear():
         os.system('cls')
     else:
         pass
+
+
+def get_trustline_balance(client: JsonRpcClient, address: str, currency: str) -> Union[float, int]:
+    all_trust_lines = get_account_trustlines(client, address)
+    lines = all_trust_lines.result.get('lines')
+
+    for line in lines:
+        if line.get('currency') == currency:
+            return float(line.get('balance'))
+        else:
+            continue
+
+    return 0
 
 
 def mass_create_order_buy(path_to_csv: str, taker_gets_xrp: Union[int, float], taker_pays_currency: str,
@@ -108,28 +121,41 @@ def mass_create_order_sell(path_to_csv: str, taker_pays_xrp: Union[int, float], 
         wallet = Wallet(data[wallet_csv.seed_index], data[wallet_csv.sequence_index])
 
         try:
-            _create_offer = create_offer_sell(
-                XRP_MAIN_CLIENT,
-                wallet,
-                taker_pays_xrp,
-                taker_gets_currency,
-                taker_gets_value,
-                taker_gets_issuer,
-                'market'
-            )
+            balance = get_trustline_balance(XRP_MAIN_CLIENT, wallet.classic_address, taker_gets_currency)
+        except Exception as e:
+            print(f'Error: {e}')
+            report.add_failed()
+            continue
 
-            if _create_offer and (_create_offer.result.get("meta").get("TransactionResult")) == 'tesSUCCESS':
-                report.add_success()
+        try:
+            if balance and balance > 0:
+                _create_offer = create_offer_sell(
+                    XRP_MAIN_CLIENT,
+                    wallet,
+                    taker_pays_xrp,
+                    taker_gets_currency,
+                    taker_gets_value,
+                    taker_gets_issuer,
+                    'market'
+                )
 
-                if debug:
-                    print(f'Status: {_create_offer.result.get("meta").get("TransactionResult")}')
+                if _create_offer and (_create_offer.result.get("meta").get("TransactionResult")) == 'tesSUCCESS':
+                    report.add_success()
 
-                time.sleep(sleep_time)
+                    if debug:
+                        print(f'Status: {_create_offer.result.get("meta").get("TransactionResult")}')
 
+                    time.sleep(sleep_time)
+
+                else:
+                    report.add_failed()
+                    if debug:
+                        print(f'Failed: [Unknown Error]')
+                    continue
             else:
                 report.add_failed()
                 if debug:
-                    print(f'Failed: [Unknown Error]')
+                    print(f'Failed: [Insufficient Balance]')
                 continue
 
         except Exception as e:
