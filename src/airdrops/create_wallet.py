@@ -4,6 +4,9 @@ import time
 
 from uuid import uuid4
 
+from colorama import init as colorama_init
+from termcolor import colored
+
 from xrpy import create_wallet, Wallet, JsonRpcClient
 
 from constants import XRP_TESTNET_URL
@@ -11,6 +14,7 @@ from csv_func import WalletCSV
 from utils import Report
 
 
+colorama_init()
 XRP_TEST_CLIENT = JsonRpcClient(XRP_TESTNET_URL)
 
 wallet_csv = WalletCSV(f'wallets-{str(uuid4())}.csv')
@@ -28,7 +32,12 @@ def clear():
 
 
 def mass_wallet_creator(count: int = 10, debug: bool = False, sleep_time: int = 0):
-    print(f'{count=} | {debug=} | {sleep_time=}')
+    print(
+        colored(
+            text=f"{count=} | {debug=} | {sleep_time=}",
+            color='cyan'
+        )
+    )
 
     if count == -1:
         count = sys.maxsize
@@ -36,36 +45,30 @@ def mass_wallet_creator(count: int = 10, debug: bool = False, sleep_time: int = 
     for i in range(count):
         try:
             if debug:
-                print(f'Trying To Create Wallet: [{i+1}/{count}]')
+                print(colored(text=f'Trying To Create Wallet: [{i+1}/{count}]', color='yellow'))
 
             wallet = create_wallet(XRP_TEST_CLIENT)
 
-            if wallet and type(wallet) == Wallet:
+            if wallet and type(wallet) == Wallet and wallet.classic_address:
                 report.add_success()
-                try:
-                    if debug:
-                        print(f'Trying To Add to CSV: [{i + 1}/{count}]')
-
-                    wallet_csv.insert_to_csv(wallet)
-                except Exception as e:
-                    print(e)
+                wallet_csv.insert_to_csv(wallet)
 
                 if debug:
-                    print(f'Created wallet: {wallet.classic_address} | [{i+1}/{count}]')
+                    print(colored(f'Created wallet: {wallet.classic_address} | [{i+1}/{count}]', color='green'))
 
                 time.sleep(sleep_time)
 
             else:
                 report.add_failed()
                 if debug:
-                    print(f'Failed to create wallet: {wallet=} | {type(wallet)=}')
+                    print(colored(f'Failed to create wallet: {wallet=} | {type(wallet)=}', color='red'))
 
         except KeyboardInterrupt:
             return
 
         except Exception as e:
             report.add_failed()
-            print(f'{e}')
+            print(colored(f'{e}', color='red'))
             continue
 
 

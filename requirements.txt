@@ -1,3 +1,5 @@
 xrpl-py
 xrpy
 psycopg2-binary
+colorama
+termcolor

@@ -2,6 +2,8 @@ import sys
 import os
 import time
 
+from colorama import init as colorama_init
+from termcolor import colored
 
 from xrpy import Wallet, JsonRpcClient, set_trust_line
 
@@ -10,6 +12,7 @@ from csv_func import WalletCSV
 from utils import Report
 
 
+colorama_init()
 XRP_MAIN_CLIENT = JsonRpcClient(XRPL_FOUNDATION)
 report = Report()
 
@@ -24,17 +27,22 @@ def clear():
 
 
 def mass_trust_line(path_to_csv: str, currency: str, value: int, issuer: str, sleep_time: int = 0, debug: bool = False):
-    print(f'{path_to_csv=} | {currency=} | {value=} | {issuer=} | {debug=}')
+    print(
+        colored(
+            text=f'{path_to_csv=} | {currency=} | {value=} | {issuer=} | {debug=}',
+            color='cyan'
+        )
+    )
 
     wallet_csv = WalletCSV(path_to_csv)
     wallet_data = wallet_csv.get_all_csv_info()[1:]
 
     if debug:
-        print(f'{len(wallet_data)} wallets imported')
+        print(colored(text=f'{len(wallet_data)} wallets imported\n\n', color='magenta'))
 
     for data in wallet_data:
         if debug:
-            print(f'{data}')
+            print(colored(text=f'{data}', color='yellow'))
 
         wallet = Wallet(data[wallet_csv.seed_index], data[wallet_csv.sequence_index])
 
@@ -45,18 +53,21 @@ def mass_trust_line(path_to_csv: str, currency: str, value: int, issuer: str, sl
                 report.add_success()
 
                 if debug:
-                    print(_trust_line.result.get("meta").get("TransactionResult"))
+                    print(colored(
+                        text=f'Status: Success',
+                        color='green'
+                    ))
 
                 time.sleep(sleep_time)
             else:
                 report.add_failed()
                 if debug:
-                    print(f'Failed: [Unknown Error]')
+                    print(colored(text=f'Failed: [Unknown Error]', color='red'))
                 continue
 
         except Exception as e:
             report.add_failed()
-            print(f'{e}')
+            print(colored(text=f'Error: {e}', color='red'))
             continue
 
 

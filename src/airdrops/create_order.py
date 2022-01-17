@@ -4,6 +4,9 @@ import time
 
 from typing import Union
 
+from colorama import init as colorama_init
+from termcolor import colored
+
 
 from xrpy import Wallet, JsonRpcClient, create_offer_buy, create_offer_sell, get_account_trustlines
 
@@ -12,6 +15,7 @@ from csv_func import WalletCSV
 from utils import Report
 
 
+colorama_init()
 XRP_MAIN_CLIENT = JsonRpcClient(XRPL_FOUNDATION)
 report = Report()
 
@@ -42,24 +46,29 @@ def mass_create_order_buy(path_to_csv: str, taker_gets_xrp: Union[int, float], t
                           taker_pays_value: str, taker_pays_issuer: str, side: str,
                           sleep_time: int = 0, debug: bool = False):
 
-    print(f'{path_to_csv=}\n'
-          f'{taker_gets_xrp=}\n'
-          f'{taker_pays_currency=}\n'
-          f'{taker_pays_value=}\n'
-          f'{taker_pays_issuer=}\n'
-          f'{side=}\n'
-          f'{sleep_time=}\n'
-          f'{debug=}\n\n')
+    print(
+        colored(
+            text=f'{path_to_csv=}\n'
+                 f'{taker_gets_xrp=}\n'
+                 f'{taker_pays_currency=}\n'
+                 f'{taker_pays_value=}\n'
+                 f'{taker_pays_issuer=}\n'
+                 f'{side=}\n'
+                 f'{sleep_time=}\n'
+                 f'{debug=}\n\n',
+            color='cyan'
+        )
+    )
 
     wallet_csv = WalletCSV(path_to_csv)
     wallet_data = wallet_csv.get_all_csv_info()[1:]
 
     if debug:
-        print(f'{len(wallet_data)} wallets imported\n\n')
+        print(colored(text=f'{len(wallet_data)} wallets imported\n\n', color='magenta'))
 
     for data in wallet_data:
         if debug:
-            print(f'{data}')
+            print(colored(text=f'{data}', color='yellow'))
 
         wallet = Wallet(data[wallet_csv.seed_index], data[wallet_csv.sequence_index])
 
@@ -78,20 +87,23 @@ def mass_create_order_buy(path_to_csv: str, taker_gets_xrp: Union[int, float], t
                 report.add_success()
 
                 if debug:
-                    print(f'Status: {_create_offer.result.get("meta").get("TransactionResult")}')
+                    print(colored(
+                        text=f'Status: Success',
+                        color='green'
+                    ))
 
                 time.sleep(sleep_time)
 
             else:
                 report.add_failed()
                 if debug:
-                    print(f'Failed: [Unknown Error]')
+                    print(colored(text=f'Failed: [Unknown Error]', color='red'))
 
                 continue
 
         except Exception as e:
             report.add_failed()
-            print(f'Error: {e}')
+            print(colored(text=f'Error: {e}', color='red'))
             continue
 
 
@@ -99,31 +111,36 @@ def mass_create_order_sell(path_to_csv: str, taker_pays_xrp: Union[int, float], 
                            taker_gets_value: str, taker_gets_issuer: str, side: str,
                            sleep_time: int = 0, debug: bool = False):
 
-    print(f'{path_to_csv=}\n'
-          f'{taker_pays_xrp=}\n'
-          f'{taker_gets_currency=}\n'
-          f'{taker_gets_value=}\n'
-          f'{taker_gets_issuer=}\n'
-          f'{side=}\n'
-          f'{sleep_time=}\n'
-          f'{debug=}\n\n')
+    print(
+        colored(
+            text=f'{path_to_csv=}\n'
+                 f'{taker_pays_xrp=}\n'
+                 f'{taker_gets_currency=}\n'
+                 f'{taker_gets_value=}\n'
+                 f'{taker_gets_issuer=}\n'
+                 f'{side=}\n'
+                 f'{sleep_time=}\n'
+                 f'{debug=}\n\n',
+            color='cyan'
+        )
+    )
 
     wallet_csv = WalletCSV(path_to_csv)
     wallet_data = wallet_csv.get_all_csv_info()[1:]
 
     if debug:
-        print(f'{len(wallet_data)} wallets imported\n\n')
+        print(colored(text=f'{len(wallet_data)} wallets imported\n\n', color='magenta'))
 
     for data in wallet_data:
         if debug:
-            print(f'{data}')
+            print(colored(text=f'{data}', color='yellow'))
 
         wallet = Wallet(data[wallet_csv.seed_index], data[wallet_csv.sequence_index])
 
         try:
             balance = get_trustline_balance(XRP_MAIN_CLIENT, wallet.classic_address, taker_gets_currency)
         except Exception as e:
-            print(f'Error: {e}')
+            print(colored(text=f'Error: {e}', color='red'))
             report.add_failed()
             continue
 
@@ -142,25 +159,27 @@ def mass_create_order_sell(path_to_csv: str, taker_pays_xrp: Union[int, float], 
                 if _create_offer and (_create_offer.result.get("meta").get("TransactionResult")) == 'tesSUCCESS':
                     report.add_success()
 
-                    if debug:
-                        print(f'Status: {_create_offer.result.get("meta").get("TransactionResult")}')
+                    print(colored(
+                        text=f'Status: Success',
+                        color='green'
+                    ))
 
                     time.sleep(sleep_time)
 
                 else:
                     report.add_failed()
                     if debug:
-                        print(f'Failed: [Unknown Error]')
+                        print(colored(text=f'Failed: [Unknown Error]', color='red'))
                     continue
             else:
                 report.add_failed()
                 if debug:
-                    print(f'Failed: [Insufficient Balance]')
+                    print(colored(text=f'Failed: [Insufficient Balance]', color='red'))
                 continue
 
         except Exception as e:
             report.add_failed()
-            print(f'Error: {e}')
+            print(colored(text=f'Error: {e}', color='red'))
             continue
 
 
@@ -233,7 +252,7 @@ def enter():
         )
 
         print('\n\n')
-        print(report.get_report())
+        print(colored(text=report.get_report(), color='cyan'))
 
     else:
         sys.exit('Invalid side')
