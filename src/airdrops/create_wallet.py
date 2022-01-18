@@ -12,9 +12,15 @@ from termcolor import colored
 
 from xrpy import create_wallet, Wallet, JsonRpcClient
 
-from constants import XRP_TESTNET_URL
-from csv_func import WalletCSV
-from utils import Report
+
+if __name__ == '__main__':
+    from constants import XRP_TESTNET_URL, CREATE_WALLET_TEXT
+    from csv_func import WalletCSV
+    from utils import Report
+else:
+    from .constants import XRP_TESTNET_URL, CREATE_WALLET_TEXT
+    from .csv_func import WalletCSV
+    from .utils import Report
 
 
 parser = argparse.ArgumentParser(description='Set trustline for airdrop wallets')
@@ -80,6 +86,8 @@ def mass_wallet_creator(count: int = 10, sleep_time: int = 0):
 def enter():
     if debug:
         print(colored(text=f'DEBUG MODE\n\n', color='red', attrs=['blink', 'bold']))
+
+    print(colored(text=CREATE_WALLET_TEXT, color='cyan'))
 
     count = int(input('Enter count: '))
 

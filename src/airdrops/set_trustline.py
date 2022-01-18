@@ -10,9 +10,15 @@ from termcolor import colored
 
 from xrpy import Wallet, JsonRpcClient, set_trust_line, get_account_trustlines
 
-from constants import XRPL_FOUNDATION
-from csv_func import WalletCSV
-from utils import Report
+
+if __name__ == '__main__':
+    from constants import XRPL_FOUNDATION, SET_TRUSTLINE_TEXT
+    from csv_func import WalletCSV
+    from utils import Report
+else:
+    from .constants import XRPL_FOUNDATION, SET_TRUSTLINE_TEXT
+    from .csv_func import WalletCSV
+    from .utils import Report
 
 
 parser = argparse.ArgumentParser(description='Set trustline for airdrop wallets')
@@ -116,6 +122,8 @@ def mass_trust_line(path_to_csv: str, currency: str, value: int, issuer: str, sl
 def enter():
     if debug:
         print(colored(text=f'DEBUG MODE\n\n', color='red', attrs=['blink', 'bold']))
+
+    print(colored(text=SET_TRUSTLINE_TEXT, color='cyan'))
 
     path_to_csv = input('Enter path to csv file: ')
 

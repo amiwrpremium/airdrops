@@ -13,9 +13,14 @@ from termcolor import colored
 
 from xrpy import Wallet, JsonRpcClient, create_offer_buy, create_offer_sell, get_account_trustlines
 
-from constants import XRPL_FOUNDATION
-from csv_func import WalletCSV
-from utils import Report
+if __name__ == '__main__':
+    from constants import XRPL_FOUNDATION, CREATE_ORDER_TEXT
+    from csv_func import WalletCSV
+    from utils import Report
+else:
+    from .constants import XRPL_FOUNDATION, CREATE_ORDER_TEXT
+    from .csv_func import WalletCSV
+    from .utils import Report
 
 
 parser = argparse.ArgumentParser(description='Set trustline for airdrop wallets')
@@ -200,6 +205,8 @@ def mass_create_order_sell(path_to_csv: str, taker_pays_xrp: Union[int, float], 
 def enter():
     if debug:
         print(colored(text=f'DEBUG MODE\n\n', color='red', attrs=['blink', 'bold']))
+
+    print(colored(text=CREATE_ORDER_TEXT, color='cyan'))
 
     path_to_csv = input('Enter path to csv file: ')
 

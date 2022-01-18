@@ -3,3 +3,4 @@ xrpy
 psycopg2-binary
 colorama
 termcolor
+prettytable

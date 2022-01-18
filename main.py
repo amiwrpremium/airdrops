@@ -1,0 +1,53 @@
+import sys
+import os
+
+from colorama import init as colorama_init
+from termcolor import colored
+
+from src.airdrops import create_wallet_entrance
+from src.airdrops import set_trustline_entrance
+from src.airdrops import create_order_entrance
+
+
+colorama_init()
+
+
+def clear():
+    if os.name == 'posix':
+        os.system('clear')
+    elif os.name == 'nt':
+        os.system('cls')
+    else:
+        pass
+
+
+def decide(option: int):
+    if option == 1:
+        create_wallet_entrance.enter()
+    elif option == 2:
+        set_trustline_entrance.enter()
+    elif option == 3:
+        create_order_entrance.enter()
+    elif option == 0:
+        sys.exit()
+
+
+def enter():
+    print(
+        "[01] \t [Create Wallet]\n"
+        "[02] \t [Set Trustline]\n"
+        "[03] \t [Create Order]\n"
+        "[00] \t [Exit]\n"
+    )
+    option = int(input("Enter option: "))
+    clear()
+    decide(option)
+
+
+if __name__ == "__main__":
+    clear()
+    try:
+        enter()
+    except KeyboardInterrupt:
+        print(colored(text='\n\nExiting...', color='red'))
+        sys.exit()
