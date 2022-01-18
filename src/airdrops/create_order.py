@@ -269,7 +269,7 @@ def enter():
         )
 
         print('\n\n')
-        print(colored(text=report.get_report(), color='cyan'))
+        print(report.get_pretty_report())
 
     else:
         print(colored(text='\n\nInvalid side', color='red'))

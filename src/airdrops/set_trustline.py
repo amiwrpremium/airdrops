@@ -152,7 +152,7 @@ def enter():
     mass_trust_line(path_to_csv, currency, value, issuer, sleep_time)
 
     print('\n\n')
-    print(report.get_report())
+    print(report.get_pretty_report())
 
 
 if __name__ == '__main__':
