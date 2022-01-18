@@ -140,7 +140,14 @@ def mass_create_order_sell(path_to_csv: str, taker_pays_xrp: Union[int, float], 
     for data in wallet_data:
         print(colored(text=f'{data}', color='yellow'))
 
-        wallet = Wallet(data[wallet_csv.seed_index], data[wallet_csv.sequence_index])
+        try:
+            wallet = Wallet(data[wallet_csv.seed_index], data[wallet_csv.sequence_index])
+        except Exception as e:
+            report.add_failed()
+            print(colored(text=f'Error: {e}', color='red'))
+            if debug:
+                print(colored(text=f'Traceback: {traceback.format_exc()}', color='red'))
+            continue
 
         try:
             balance = get_trustline_balance(XRP_MAIN_CLIENT, wallet.classic_address, taker_gets_currency)
@@ -201,16 +208,19 @@ def enter():
     try:
         sleep_time = int(input('Enter sleep time: '))
     except ValueError:
-        sys.exit('Sleep time must be an integer')
+        print(colored(text='\n\nSleep time must be an integer', color='red'))
+        sys.exit()
 
     if sleep_time < 0:
-        sys.exit('Invalid sleep time')
+        print(colored(text='\n\nInvalid sleep time', color='red'))
+        sys.exit()
 
     if side.lower() == 'buy':
         try:
             taker_gets_xrp = float(input('Enter taker gets XRP: '))
         except ValueError:
-            sys.exit('Error: taker gets XRP must be an integer')
+            print(colored(text='\n\ntaker gets XRP must be an float', color='red'))
+            sys.exit()
 
         taker_pays_currency = input('Enter taker pays currency: ')
         taker_pays_value = input('Enter taker pays value: ')
@@ -232,7 +242,8 @@ def enter():
         try:
             taker_pays_xrp = float(input('Enter taker pays XRP: '))
         except ValueError:
-            sys.exit('Error: taker gets XRP must be an integer')
+            print(colored(text='\n\nError: taker gets XRP must be an float', color='red'))
+            sys.exit()
 
         taker_gets_currency = input('Enter taker gets currency: ')
         taker_gets_value = input('Enter taker gets value: ')
@@ -254,9 +265,14 @@ def enter():
         print(colored(text=report.get_report(), color='cyan'))
 
     else:
-        sys.exit('Invalid side')
+        print(colored(text='\n\nInvalid side', color='red'))
+        sys.exit()
 
 
 if __name__ == '__main__':
     clear()
-    enter()
+    try:
+        enter()
+    except KeyboardInterrupt:
+        print(colored(text='\n\nExiting...', color='red'))
+        sys.exit()

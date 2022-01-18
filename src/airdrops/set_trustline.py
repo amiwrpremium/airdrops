@@ -64,9 +64,23 @@ def mass_trust_line(path_to_csv: str, currency: str, value: int, issuer: str, sl
     for data in wallet_data:
         print(colored(text=f'{data}', color='yellow'))
 
-        wallet = Wallet(data[wallet_csv.seed_index], data[wallet_csv.sequence_index])
+        try:
+            wallet = Wallet(data[wallet_csv.seed_index], data[wallet_csv.sequence_index])
+        except Exception as e:
+            report.add_failed()
+            print(colored(text=f'Error: {e}', color='red'))
+            if debug:
+                print(colored(text=f'Traceback: {traceback.format_exc()}', color='red'))
+            continue
 
-        _is_set = is_trustline_set(client=XRP_MAIN_CLIENT, address=wallet.classic_address, currency=currency)
+        try:
+            _is_set = is_trustline_set(client=XRP_MAIN_CLIENT, address=wallet.classic_address, currency=currency)
+        except Exception as e:
+            report.add_failed()
+            print(colored(text=f'Error: {e}', color='red'))
+            if debug:
+                print(colored(text=f'Traceback: {traceback.format_exc()}', color='red'))
+            continue
 
         if (_is_set and value == 0) or (not _is_set and value > 0):
             try:
@@ -110,17 +124,20 @@ def enter():
     try:
         value = int(input('Enter value: '))
     except ValueError:
-        sys.exit('Value must be an integer')
+        print(colored(text='\n\nValue must be an integer', color='red'))
+        sys.exit()
 
     issuer = input('Enter issuer: ')
 
     try:
         sleep_time = int(input('Enter sleep time: '))
     except ValueError:
-        sys.exit('Sleep time must be an integer')
+        print(colored(text='\n\nSleep time must be an integer', color='red'))
+        sys.exit()
 
     if sleep_time < 0:
-        sys.exit('Invalid sleep time')
+        print(colored(text='\n\nInvalid sleep time', color='red'))
+        sys.exit()
 
     clear()
 
@@ -132,4 +149,8 @@ def enter():
 
 if __name__ == '__main__':
     clear()
-    enter()
+    try:
+        enter()
+    except KeyboardInterrupt:
+        print(colored(text='\n\nExiting...', color='red'))
+        sys.exit()

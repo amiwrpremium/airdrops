@@ -84,12 +84,14 @@ def enter():
     count = int(input('Enter count: '))
 
     if count < -1 or count == 0:
-        sys.exit('Invalid count')
+        print(colored(text='\n\nInvalid count', color='red'))
+        sys.exit()
 
     sleep_time = int(input('Enter sleep time: '))
 
     if sleep_time < 0:
-        sys.exit('Invalid sleep time')
+        print(colored(text='\n\nInvalid sleep time', color='red'))
+        sys.exit()
 
     clear()
 
@@ -101,4 +103,8 @@ def enter():
 
 if __name__ == '__main__':
     clear()
-    enter()
+    try:
+        enter()
+    except KeyboardInterrupt:
+        print(colored(text='\n\nExiting...', color='red'))
+        sys.exit()
