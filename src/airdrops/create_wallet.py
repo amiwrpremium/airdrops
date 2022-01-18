@@ -2,7 +2,13 @@ import sys
 import os
 import time
 
+import argparse
+import traceback
+
 from uuid import uuid4
+
+from colorama import init as colorama_init
+from termcolor import colored
 
 from xrpy import create_wallet, Wallet, JsonRpcClient
 
@@ -11,6 +17,13 @@ from csv_func import WalletCSV
 from utils import Report
 
 
+parser = argparse.ArgumentParser(description='Set trustline for airdrop wallets')
+parser.add_argument('--debug', '-D', dest='debug', help='Debug mode', action='store_true')
+args = parser.parse_args()
+debug = True if args.debug else False
+
+
+colorama_init()
 XRP_TEST_CLIENT = JsonRpcClient(XRP_TESTNET_URL)
 
 wallet_csv = WalletCSV(f'wallets-{str(uuid4())}.csv')
@@ -27,49 +40,47 @@ def clear():
         pass
 
 
-def mass_wallet_creator(count: int = 10, debug: bool = False, sleep_time: int = 0):
-    print(f'{count=} | {debug=} | {sleep_time=}')
+def mass_wallet_creator(count: int = 10, sleep_time: int = 0):
+    print(
+        colored(
+            text=f"{count=} | {sleep_time=}",
+            color='cyan'
+        )
+    )
 
     if count == -1:
         count = sys.maxsize
 
     for i in range(count):
         try:
-            if debug:
-                print(f'Trying To Create Wallet: [{i+1}/{count}]')
+            print(colored(text=f'Trying To Create Wallet: [{i+1}/{count}]', color='yellow'))
 
             wallet = create_wallet(XRP_TEST_CLIENT)
 
-            if wallet and type(wallet) == Wallet:
+            if wallet and type(wallet) == Wallet and wallet.classic_address:
                 report.add_success()
-                try:
-                    if debug:
-                        print(f'Trying To Add to CSV: [{i + 1}/{count}]')
+                wallet_csv.insert_to_csv(wallet)
 
-                    wallet_csv.insert_to_csv(wallet)
-                except Exception as e:
-                    print(e)
-
-                if debug:
-                    print(f'Created wallet: {wallet.classic_address} | [{i+1}/{count}]')
+                print(colored(f'Created wallet: {wallet.classic_address} | [{i+1}/{count}]', color='green'))
 
                 time.sleep(sleep_time)
 
             else:
                 report.add_failed()
-                if debug:
-                    print(f'Failed to create wallet: {wallet=} | {type(wallet)=}')
-
-        except KeyboardInterrupt:
-            return
+                print(colored(f'Failed to create wallet: {wallet=} | {type(wallet)=}', color='red'))
 
         except Exception as e:
             report.add_failed()
-            print(f'{e}')
+            print(colored(f'Error: {e}', color='red'))
+            if debug:
+                print(colored(text=f'Traceback: {traceback.format_exc()}', color='red'))
             continue
 
 
 def enter():
+    if debug:
+        print(colored(text=f'DEBUG MODE\n\n', color='red', attrs=['blink', 'bold']))
+
     count = int(input('Enter count: '))
 
     if count < -1 or count == 0:
@@ -80,22 +91,14 @@ def enter():
     if sleep_time < 0:
         sys.exit('Invalid sleep time')
 
-    _debug = input('Debug? (y/n): ') or 'y'
-
-    if _debug.lower() == 'y':
-        debug = True
-    elif _debug.lower() == 'n':
-        debug = False
-    else:
-        sys.exit('Invalid debug')
-
     clear()
 
-    mass_wallet_creator(count, debug, sleep_time)
+    mass_wallet_creator(count, sleep_time)
 
     print('\n\n')
     print(report.get_report())
 
 
 if __name__ == '__main__':
+    clear()
     enter()

@@ -2,14 +2,26 @@ import sys
 import os
 import time
 
+import argparse
+import traceback
 
-from xrpy import Wallet, JsonRpcClient, set_trust_line
+from colorama import init as colorama_init
+from termcolor import colored
+
+from xrpy import Wallet, JsonRpcClient, set_trust_line, get_account_trustlines
 
 from constants import XRPL_FOUNDATION
 from csv_func import WalletCSV
 from utils import Report
 
 
+parser = argparse.ArgumentParser(description='Set trustline for airdrop wallets')
+parser.add_argument('--debug', '-D', dest='debug', help='Debug mode', action='store_true')
+args = parser.parse_args()
+debug = True if args.debug else False
+
+
+colorama_init()
 XRP_MAIN_CLIENT = JsonRpcClient(XRPL_FOUNDATION)
 report = Report()
 
@@ -23,44 +35,74 @@ def clear():
         pass
 
 
-def mass_trust_line(path_to_csv: str, currency: str, value: int, issuer: str, sleep_time: int = 0, debug: bool = False):
-    print(f'{path_to_csv=} | {currency=} | {value=} | {issuer=} | {debug=}')
+def is_trustline_set(client: JsonRpcClient, address: str, currency: str) -> bool:
+    all_trust_lines = get_account_trustlines(client, address)
+    lines = all_trust_lines.result.get('lines')
+
+    for line in lines:
+        if line.get('currency') == currency:
+            return True
+        else:
+            continue
+
+    return False
+
+
+def mass_trust_line(path_to_csv: str, currency: str, value: int, issuer: str, sleep_time: int = 0):
+    print(
+        colored(
+            text=f'{path_to_csv=} | {currency=} | {value=} | {issuer=}',
+            color='cyan'
+        )
+    )
 
     wallet_csv = WalletCSV(path_to_csv)
     wallet_data = wallet_csv.get_all_csv_info()[1:]
 
-    if debug:
-        print(f'{len(wallet_data)} wallets imported')
+    print(colored(text=f'{len(wallet_data)} wallets imported\n\n', color='magenta'))
 
     for data in wallet_data:
-        if debug:
-            print(f'{data}')
+        print(colored(text=f'{data}', color='yellow'))
 
         wallet = Wallet(data[wallet_csv.seed_index], data[wallet_csv.sequence_index])
 
-        try:
-            _trust_line = set_trust_line(XRP_MAIN_CLIENT, wallet, currency, str(value), issuer)
+        _is_set = is_trustline_set(client=XRP_MAIN_CLIENT, address=wallet.classic_address, currency=currency)
 
-            if _trust_line and (_trust_line.result.get("meta").get("TransactionResult")) == 'tesSUCCESS':
-                report.add_success()
+        if (_is_set and value == 0) or (not _is_set and value > 0):
+            try:
+                _trust_line = set_trust_line(XRP_MAIN_CLIENT, wallet, currency, str(value), issuer)
+                result = _trust_line.result.get("meta").get("TransactionResult")
 
-                if debug:
-                    print(_trust_line.result.get("meta").get("TransactionResult"))
+                if _trust_line and result == 'tesSUCCESS':
+                    report.add_success()
 
-                time.sleep(sleep_time)
-            else:
+                    print(colored(
+                        text=f'Status: Success',
+                        color='green'
+                    ))
+
+                    time.sleep(sleep_time)
+                else:
+                    report.add_failed()
+                    print(colored(text=f'Failed: [Unknown Error] | [{result}]', color='red'))
+                    continue
+
+            except Exception as e:
                 report.add_failed()
+                print(colored(text=f'Error: {e}', color='red'))
                 if debug:
-                    print(f'Failed: [Unknown Error]')
+                    print(colored(text=f'Traceback: {traceback.format_exc()}', color='red'))
                 continue
-
-        except Exception as e:
+        else:
             report.add_failed()
-            print(f'{e}')
+            print(colored(text=f'Failed: [Trustline already set]', color='red'))
             continue
 
 
 def enter():
+    if debug:
+        print(colored(text=f'DEBUG MODE\n\n', color='red', attrs=['blink', 'bold']))
+
     path_to_csv = input('Enter path to csv file: ')
 
     currency = input('Enter currency: ')
@@ -80,22 +122,14 @@ def enter():
     if sleep_time < 0:
         sys.exit('Invalid sleep time')
 
-    _debug = input('Debug? (y/n): ') or 'y'
-
-    if _debug.lower() == 'y':
-        debug = True
-    elif _debug.lower() == 'n':
-        debug = False
-    else:
-        sys.exit('Invalid debug')
-
     clear()
 
-    mass_trust_line(path_to_csv, currency, value, issuer, sleep_time, debug)
+    mass_trust_line(path_to_csv, currency, value, issuer, sleep_time)
 
     print('\n\n')
     print(report.get_report())
 
 
 if __name__ == '__main__':
+    clear()
     enter()
