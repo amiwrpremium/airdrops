@@ -54,7 +54,7 @@ def is_trustline_set(client: JsonRpcClient, address: str, currency: str) -> bool
     return False
 
 
-def mass_trust_line(path_to_csv: str, currency: str, value: int, issuer: str, sleep_time: int = 0):
+def mass_trust_line(path_to_csv: str, currency: str, value: int, issuer: str, sleep_time: int = 0, __debug: bool = False):
     print(
         colored(
             text=f'{path_to_csv=} | {currency=} | {value=} | {issuer=}',
@@ -75,7 +75,7 @@ def mass_trust_line(path_to_csv: str, currency: str, value: int, issuer: str, sl
         except Exception as e:
             report.add_failed()
             print(colored(text=f'Error: {e}', color='red'))
-            if debug:
+            if debug or __debug:
                 print(colored(text=f'Traceback: {traceback.format_exc()}', color='red'))
             continue
 
@@ -84,7 +84,7 @@ def mass_trust_line(path_to_csv: str, currency: str, value: int, issuer: str, sl
         except Exception as e:
             report.add_failed()
             print(colored(text=f'Error: {e}', color='red'))
-            if debug:
+            if debug or __debug:
                 print(colored(text=f'Traceback: {traceback.format_exc()}', color='red'))
             continue
 
@@ -110,7 +110,7 @@ def mass_trust_line(path_to_csv: str, currency: str, value: int, issuer: str, sl
             except Exception as e:
                 report.add_failed()
                 print(colored(text=f'Error: {e}', color='red'))
-                if debug:
+                if debug or __debug:
                     print(colored(text=f'Traceback: {traceback.format_exc()}', color='red'))
                 continue
         else:
@@ -119,8 +119,8 @@ def mass_trust_line(path_to_csv: str, currency: str, value: int, issuer: str, sl
             continue
 
 
-def enter():
-    if debug:
+def enter(__debug: bool = False):
+    if debug or __debug:
         print(colored(text=f'DEBUG MODE\n\n', color='red', attrs=['blink', 'bold']))
 
     print(colored(text=SET_TRUSTLINE_TEXT, color='cyan'))

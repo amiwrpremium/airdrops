@@ -32,8 +32,6 @@ debug = True if args.debug else False
 colorama_init()
 XRP_TEST_CLIENT = JsonRpcClient(XRP_TESTNET_URL)
 
-wallet_csv = WalletCSV(f'wallets-{str(uuid4())}.csv')
-wallet_csv.write_headers()
 report = Report()
 
 
@@ -46,7 +44,10 @@ def clear():
         pass
 
 
-def mass_wallet_creator(count: int = 10, sleep_time: int = 0):
+def mass_wallet_creator(count: int = 10, sleep_time: int = 0, __debug: bool = False):
+    wallet_csv = WalletCSV(f'wallets-{str(uuid4())}.csv')
+    wallet_csv.write_headers()
+
     print(
         colored(
             text=f"{count=} | {sleep_time=}",
@@ -78,13 +79,13 @@ def mass_wallet_creator(count: int = 10, sleep_time: int = 0):
         except Exception as e:
             report.add_failed()
             print(colored(f'Error: {e}', color='red'))
-            if debug:
+            if debug or __debug:
                 print(colored(text=f'Traceback: {traceback.format_exc()}', color='red'))
             continue
 
 
-def enter():
-    if debug:
+def enter(__debug: bool = False):
+    if debug or __debug:
         print(colored(text=f'DEBUG MODE\n\n', color='red', attrs=['blink', 'bold']))
 
     print(colored(text=CREATE_WALLET_TEXT, color='cyan'))

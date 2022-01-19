@@ -1,5 +1,6 @@
 import sys
 import os
+import argparse
 
 from colorama import init as colorama_init
 from termcolor import colored
@@ -7,6 +8,12 @@ from termcolor import colored
 from src.airdrops import create_wallet_entrance
 from src.airdrops import set_trustline_entrance
 from src.airdrops import create_order_entrance
+
+
+parser = argparse.ArgumentParser(description='Set trustline for airdrop wallets')
+parser.add_argument('--debug', '-D', dest='debug', help='Debug mode', action='store_true')
+args = parser.parse_args()
+main_debug = True if args.debug else False
 
 
 colorama_init()
@@ -23,11 +30,11 @@ def clear():
 
 def decide(option: int):
     if option == 1:
-        create_wallet_entrance.enter()
+        create_wallet_entrance.enter(main_debug)
     elif option == 2:
-        set_trustline_entrance.enter()
+        set_trustline_entrance.enter(main_debug)
     elif option == 3:
-        create_order_entrance.enter()
+        create_order_entrance.enter(main_debug)
     elif option == 0:
         sys.exit()
 
