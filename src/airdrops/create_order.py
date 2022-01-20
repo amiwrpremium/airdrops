@@ -60,7 +60,7 @@ def get_trustline_balance(client: JsonRpcClient, address: str, currency: str) ->
 
 def mass_create_order_buy(path_to_csv: str, taker_gets_xrp: Union[int, float], taker_pays_currency: str,
                           taker_pays_value: str, taker_pays_issuer: str, side: str,
-                          sleep_time: int = 0, __debug: bool = False):
+                          min_sleep_time: int = 0, max_sleep_time: int = 0, __debug: bool = False):
 
     print(
         colored(
@@ -70,7 +70,8 @@ def mass_create_order_buy(path_to_csv: str, taker_gets_xrp: Union[int, float], t
                  f'{taker_pays_value=}\n'
                  f'{taker_pays_issuer=}\n'
                  f'{side=}\n'
-                 f'{sleep_time=}\n\n',
+                 f'{min_sleep_time=}\n'
+                 f'{max_sleep_time=}\n\n',
             color='cyan'
         )
     )
@@ -106,6 +107,7 @@ def mass_create_order_buy(path_to_csv: str, taker_gets_xrp: Union[int, float], t
                     color='green'
                 ))
 
+                sleep_time = randint(min_sleep_time, max_sleep_time)
                 print(colored(text=f"Sleeping for {sleep_time} seconds", color='blue'))
                 time.sleep(sleep_time)
 
@@ -125,7 +127,7 @@ def mass_create_order_buy(path_to_csv: str, taker_gets_xrp: Union[int, float], t
 
 def mass_create_order_sell(path_to_csv: str, taker_pays_xrp: Union[int, float], taker_gets_currency: str,
                            taker_gets_value: str, taker_gets_issuer: str, side: str,
-                           sleep_time: int = 0, __debug: bool = False):
+                           min_sleep_time: int = 0, max_sleep_time: int = 0, __debug: bool = False):
 
     print(
         colored(
@@ -135,7 +137,8 @@ def mass_create_order_sell(path_to_csv: str, taker_pays_xrp: Union[int, float], 
                  f'{taker_gets_value=}\n'
                  f'{taker_gets_issuer=}\n'
                  f'{side=}\n'
-                 f'{sleep_time=}\n\n',
+                 f'{min_sleep_time=}\n'
+                 f'{max_sleep_time=}\n\n',
             color='cyan'
         )
     )
@@ -186,6 +189,7 @@ def mass_create_order_sell(path_to_csv: str, taker_pays_xrp: Union[int, float], 
                         color='green'
                     ))
 
+                    sleep_time = randint(min_sleep_time, max_sleep_time)
                     print(colored(text=f"Sleeping for {sleep_time} seconds. zZz...", color='blue'))
                     time.sleep(sleep_time)
 
@@ -231,11 +235,6 @@ def enter(__debug: bool = False):
         print(colored(text='\n\nMin sleep time must be less than max sleep time', color='red'))
         sys.exit()
 
-    sleep_time = randint(min_sleep_time, max_sleep_time)
-    if sleep_time < 0:
-        print(colored(text='\n\nInvalid sleep time', color='red'))
-        sys.exit()
-
     if side.lower() == 'buy':
         try:
             taker_gets_xrp = float(input('Enter taker gets XRP: '))
@@ -256,7 +255,9 @@ def enter(__debug: bool = False):
             taker_pays_value,
             taker_pays_issuer,
             side,
-            sleep_time,
+            min_sleep_time,
+            max_sleep_time,
+            debug or __debug
         )
 
     elif side.lower() == 'sell':
@@ -279,7 +280,9 @@ def enter(__debug: bool = False):
             taker_gets_value,
             taker_gets_issuer,
             side,
-            sleep_time,
+            min_sleep_time,
+            max_sleep_time,
+            debug or __debug
         )
 
         print('\n\n')

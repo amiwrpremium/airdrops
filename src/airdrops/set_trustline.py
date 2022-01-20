@@ -56,7 +56,8 @@ def is_trustline_set(client: JsonRpcClient, address: str, currency: str) -> bool
     return False
 
 
-def mass_trust_line(path_to_csv: str, currency: str, value: int, issuer: str, sleep_time: int = 0, __debug: bool = False):
+def mass_trust_line(path_to_csv: str, currency: str, value: int, issuer: str,
+                    min_sleep_time: int = 0, max_sleep_time: int = 0, __debug: bool = False):
     print(
         colored(
             text=f'{path_to_csv=} | {currency=} | {value=} | {issuer=}',
@@ -103,6 +104,7 @@ def mass_trust_line(path_to_csv: str, currency: str, value: int, issuer: str, sl
                         color='green'
                     ))
 
+                    sleep_time = randint(min_sleep_time, max_sleep_time)
                     print(colored(text=f"Sleeping for {sleep_time} seconds. zZz...", color='blue'))
                     time.sleep(sleep_time)
                 else:
@@ -155,15 +157,9 @@ def enter(__debug: bool = False):
         print(colored(text='\n\nMin sleep time must be less than max sleep time', color='red'))
         sys.exit()
 
-    sleep_time = randint(min_sleep_time, max_sleep_time)
-
-    if sleep_time < 0:
-        print(colored(text='\n\nInvalid sleep time', color='red'))
-        sys.exit()
-
     clear()
 
-    mass_trust_line(path_to_csv, currency, value, issuer, sleep_time)
+    mass_trust_line(path_to_csv, currency, value, issuer, min_sleep_time, max_sleep_time, debug or __debug)
 
     print('\n\n')
     print(report.get_pretty_report())

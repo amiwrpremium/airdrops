@@ -46,13 +46,13 @@ def clear():
         pass
 
 
-def mass_wallet_creator(count: int = 10, sleep_time: int = 0, __debug: bool = False):
+def mass_wallet_creator(count: int = 10, min_sleep_time: int = 0, max_sleep_time: int = 0, __debug: bool = False):
     wallet_csv = WalletCSV(f'wallets-{str(uuid4())}.csv')
     wallet_csv.write_headers()
 
     print(
         colored(
-            text=f"{count=} | {sleep_time=}",
+            text=f"{count=} | {min_sleep_time=} | {max_sleep_time=}",
             color='cyan'
         )
     )
@@ -72,6 +72,7 @@ def mass_wallet_creator(count: int = 10, sleep_time: int = 0, __debug: bool = Fa
 
                 print(colored(f'Created wallet: {wallet.classic_address} | [{i+1}/{count}]', color='green'))
 
+                sleep_time = randint(min_sleep_time, max_sleep_time)
                 print(colored(text=f"Sleeping for {sleep_time} seconds. zZz...", color='blue'))
                 time.sleep(sleep_time)
 
@@ -114,15 +115,9 @@ def enter(__debug: bool = False):
         print(colored(text='\n\nMin sleep time must be less than max sleep time', color='red'))
         sys.exit()
 
-    sleep_time = randint(min_sleep_time, max_sleep_time)
-
-    if sleep_time < 0:
-        print(colored(text='\n\nInvalid sleep time', color='red'))
-        sys.exit()
-
     clear()
 
-    mass_wallet_creator(count, sleep_time)
+    mass_wallet_creator(count, min_sleep_time, max_sleep_time, debug or __debug)
 
     print('\n\n')
     print(report.get_pretty_report())
