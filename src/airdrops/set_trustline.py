@@ -103,6 +103,7 @@ def mass_trust_line(path_to_csv: str, currency: str, value: int, issuer: str, sl
                         color='green'
                     ))
 
+                    print(colored(text=f"Sleeping for {sleep_time} seconds. zZz...", color='blue'))
                     time.sleep(sleep_time)
                 else:
                     report.add_failed()

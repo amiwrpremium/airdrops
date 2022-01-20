@@ -47,7 +47,7 @@ class Report:
 
     def get_pretty_report(self):
         table = PrettyTable()
-        table.title = colored(f"Result", "blue")
+        table.title = colored(f"Result", "magenta")
         table.field_names = ["Data", "Value"]
         table.add_row(["Success", colored(text=self.success, color='green')])
         table.add_row(["Failed", colored(text=self.failed, color='red')])

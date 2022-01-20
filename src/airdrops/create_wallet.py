@@ -72,6 +72,7 @@ def mass_wallet_creator(count: int = 10, sleep_time: int = 0, __debug: bool = Fa
 
                 print(colored(f'Created wallet: {wallet.classic_address} | [{i+1}/{count}]', color='green'))
 
+                print(colored(text=f"Sleeping for {sleep_time} seconds. zZz...", color='blue'))
                 time.sleep(sleep_time)
 
             else:

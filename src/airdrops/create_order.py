@@ -106,6 +106,7 @@ def mass_create_order_buy(path_to_csv: str, taker_gets_xrp: Union[int, float], t
                     color='green'
                 ))
 
+                print(colored(text=f"Sleeping for {sleep_time} seconds", color='blue'))
                 time.sleep(sleep_time)
 
             else:
@@ -185,6 +186,7 @@ def mass_create_order_sell(path_to_csv: str, taker_pays_xrp: Union[int, float], 
                         color='green'
                     ))
 
+                    print(colored(text=f"Sleeping for {sleep_time} seconds. zZz...", color='blue'))
                     time.sleep(sleep_time)
 
                 else:
