@@ -60,12 +60,7 @@ def mass_trust_line(path_to_csv: str, skip_already_set: bool, currency: str, val
                     min_sleep_time: int = 0, max_sleep_time: int = 0, __debug: bool = False):
     print(
         colored(
-            text=f'{path_to_csv=}\n'
-                 f'{currency=}\n'
-                 f'{value=}\n'
-                 f'{issuer=}\n'
-                 f'{min_sleep_time=}\n'
-                 f'{max_sleep_time=}\n\n',
+            text=f'{path_to_csv=} | {currency=} | {value=} | {issuer=}',
             color='cyan'
         )
     )
