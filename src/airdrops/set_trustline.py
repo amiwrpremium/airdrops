@@ -5,6 +5,8 @@ import time
 import argparse
 import traceback
 
+from random import randint
+
 from colorama import init as colorama_init
 from termcolor import colored
 
@@ -138,10 +140,21 @@ def enter(__debug: bool = False):
     issuer = input('Enter issuer: ')
 
     try:
-        sleep_time = int(input('Enter sleep time: '))
+        min_sleep_time = int(input('Enter min sleep time: '))
+        max_sleep_time = int(input('Enter max sleep time: '))
     except ValueError:
-        print(colored(text='\n\nSleep time must be an integer', color='red'))
+        print(colored(text='\n\nInvalid sleep time should be integer', color='red'))
         sys.exit()
+
+    if min_sleep_time < 0 or max_sleep_time < 0:
+        print(colored(text='\n\nInvalid sleep time', color='red'))
+        sys.exit()
+
+    if min_sleep_time > max_sleep_time:
+        print(colored(text='\n\nMin sleep time must be less than max sleep time', color='red'))
+        sys.exit()
+
+    sleep_time = randint(min_sleep_time, max_sleep_time)
 
     if sleep_time < 0:
         print(colored(text='\n\nInvalid sleep time', color='red'))
