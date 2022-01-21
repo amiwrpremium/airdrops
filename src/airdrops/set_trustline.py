@@ -171,7 +171,7 @@ def enter(__debug: bool = False):
 
     clear()
 
-    mass_trust_line(path_to_csv, currency, value, issuer, min_sleep_time, max_sleep_time, debug or __debug)
+    mass_trust_line(path_to_csv, skip, currency, value, issuer, min_sleep_time, max_sleep_time, debug or __debug)
 
     print('\n\n')
     print(report.get_pretty_report())
