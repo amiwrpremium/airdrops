@@ -56,7 +56,7 @@ def is_trustline_set(client: JsonRpcClient, address: str, currency: str) -> bool
     return False
 
 
-def mass_trust_line(path_to_csv: str, currency: str, value: int, issuer: str,
+def mass_trust_line(path_to_csv: str, skip_already_set: bool, currency: str, value: int, issuer: str,
                     min_sleep_time: int = 0, max_sleep_time: int = 0, __debug: bool = False):
     print(
         colored(
@@ -96,7 +96,7 @@ def mass_trust_line(path_to_csv: str, currency: str, value: int, issuer: str,
                 print(colored(text=f'Traceback: {traceback.format_exc()}', color='red'))
             continue
 
-        if (_is_set and value == 0) or (not _is_set and value > 0):
+        if ((_is_set and value == 0) or (not _is_set and value > 0)) and skip_already_set:
             try:
                 _trust_line = set_trust_line(XRP_MAIN_CLIENT, wallet, currency, str(value), issuer)
                 result = _trust_line.result.get("meta").get("TransactionResult")
@@ -136,6 +136,13 @@ def enter(__debug: bool = False):
     print(colored(text=SET_TRUSTLINE_TEXT, color='cyan'))
 
     path_to_csv = input('Enter path to csv file: ')
+
+    skip_already_set = input('Skip already set trustlines? (y/n): ')
+
+    if skip_already_set.lower() == 'y':
+        skip = True
+    else:
+        skip = False
 
     currency = input('Enter currency: ')
 
