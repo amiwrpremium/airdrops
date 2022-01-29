@@ -2,7 +2,7 @@
 <h3>Requirements:</h3>
 <ul>
 <li>Install <a href="https://www.python.org">Python 3.8+</a></li>
-<li>Download Source: <code>git clone https://github.com/samitabar/airdrops.git</code></li>
+<li>Download Source: <code>git clone https://github.com/amiwrpremium/airdrops.git</code></li>
 <li>CD To Directory: <code>cd airdrops</code></li>
 <li>Install Requirements: <code>pip3 install --upgrade -r requirements.txt</code></li>
 </ul>
