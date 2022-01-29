@@ -133,8 +133,8 @@ def mass_trust_line(path_to_csv: str, skip_already_set: bool, currency: str, val
                     if debug or __debug:
                         print(colored(text=f'Traceback: {traceback.format_exc()}', color='red'))
                     continue
-                else:
-                    print(colored(text=f'Insufficient Reserve For Setting Trustline', color='red'))
+            else:
+                print(colored(text=f'Insufficient Reserve For Setting Trustline', color='red'))
         else:
             report.add_failed()
             print(colored(text=f'Failed: [Trustline already set]', color='red'))
