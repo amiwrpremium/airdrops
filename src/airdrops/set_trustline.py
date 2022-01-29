@@ -107,8 +107,6 @@ def mass_trust_line(path_to_csv: str, skip_already_set: bool, currency: str, val
                 if debug or __debug:
                     print(colored(text=f'Traceback: {traceback.format_exc()}', color='red'))
                 continue
-            else:
-                print(colored(text=f'Insufficient Reserve For Setting Trustline', color='red'))
             if float(xrp_balance) > 2:
                 try:
                     _trust_line = set_trust_line(XRP_MAIN_CLIENT, wallet, currency, str(value), issuer)
@@ -129,7 +127,6 @@ def mass_trust_line(path_to_csv: str, skip_already_set: bool, currency: str, val
                         report.add_failed()
                         print(colored(text=f'Failed: [Unknown Error] | [{result}]', color='red'))
                         continue
-
                 except Exception as e:
                     report.add_failed()
                     print(colored(text=f'Error: {e}', color='red'))
