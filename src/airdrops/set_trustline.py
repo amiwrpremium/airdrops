@@ -10,7 +10,7 @@ from random import randint
 from colorama import init as colorama_init
 from termcolor import colored
 
-from xrpy import Wallet, JsonRpcClient, set_trust_line, get_account_trustlines
+from xrpy import Wallet, JsonRpcClient, set_trust_line, get_account_trustlines, get_account_info
 
 
 if __name__ == '__main__':
@@ -99,31 +99,42 @@ def mass_trust_line(path_to_csv: str, skip_already_set: bool, currency: str, val
 
         if ((_is_set and value == 0) or (not _is_set and value > 0)) or skip_already_set:
             try:
-                _trust_line = set_trust_line(XRP_MAIN_CLIENT, wallet, currency, str(value), issuer)
-                result = _trust_line.result.get("meta").get("TransactionResult")
-
-                if _trust_line and result == 'tesSUCCESS':
-                    report.add_success()
-
-                    print(colored(
-                        text=f'Status: Success',
-                        color='green'
-                    ))
-
-                    sleep_time = randint(min_sleep_time, max_sleep_time)
-                    print(colored(text=f"Sleeping for {sleep_time} seconds. zZz...", color='blue'))
-                    time.sleep(sleep_time)
-                else:
-                    report.add_failed()
-                    print(colored(text=f'Failed: [Unknown Error] | [{result}]', color='red'))
-                    continue
-
+                balance = get_account_info(XRP_MAIN_CLIENT, wallet.classic_address).result.get("account_data").get("Balance")
+                xrp_balance = int(balance)/1000000
             except Exception as e:
                 report.add_failed()
                 print(colored(text=f'Error: {e}', color='red'))
                 if debug or __debug:
                     print(colored(text=f'Traceback: {traceback.format_exc()}', color='red'))
                 continue
+            if float(xrp_balance) > 2:
+                try:
+                    _trust_line = set_trust_line(XRP_MAIN_CLIENT, wallet, currency, str(value), issuer)
+                    result = _trust_line.result.get("meta").get("TransactionResult")
+
+                    if _trust_line and result == 'tesSUCCESS':
+                        report.add_success()
+
+                        print(colored(
+                            text=f'Status: Success',
+                            color='green'
+                        ))
+
+                        sleep_time = randint(min_sleep_time, max_sleep_time)
+                        print(colored(text=f"Sleeping for {sleep_time} seconds. zZz...", color='blue'))
+                        time.sleep(sleep_time)
+                    else:
+                        report.add_failed()
+                        print(colored(text=f'Failed: [Unknown Error] | [{result}]', color='red'))
+                        continue
+                except Exception as e:
+                    report.add_failed()
+                    print(colored(text=f'Error: {e}', color='red'))
+                    if debug or __debug:
+                        print(colored(text=f'Traceback: {traceback.format_exc()}', color='red'))
+                    continue
+            else:
+                print(colored(text=f'Insufficient Reserve For Setting Trustline', color='red'))
         else:
             report.add_failed()
             print(colored(text=f'Failed: [Trustline already set]', color='red'))
