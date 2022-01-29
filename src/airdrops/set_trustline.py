@@ -7,7 +7,6 @@ import traceback
 
 from random import randint
 
-import xrpy
 from colorama import init as colorama_init
 from termcolor import colored
 
@@ -99,8 +98,17 @@ def mass_trust_line(path_to_csv: str, skip_already_set: bool, currency: str, val
             continue
 
         if ((_is_set and value == 0) or (not _is_set and value > 0)) or skip_already_set:
-            balance = xrpy.get_account_info(XRP_MAIN_CLIENT, wallet.classic_address).result.get("account_data").get("Balance")
-            xrp_balance = int(balance)/1000000
+            try:
+                balance = get_account_info(XRP_MAIN_CLIENT, wallet.classic_address).result.get("account_data").get("Balance")
+                xrp_balance = int(balance)/1000000
+            except Exception as e:
+                report.add_failed()
+                print(colored(text=f'Error: {e}', color='red'))
+                if debug or __debug:
+                    print(colored(text=f'Traceback: {traceback.format_exc()}', color='red'))
+                continue
+            else:
+                print(colored(text=f'Insufficient Reserve For Setting Trustline', color='red'))
             if float(xrp_balance) > 2:
                 try:
                     _trust_line = set_trust_line(XRP_MAIN_CLIENT, wallet, currency, str(value), issuer)
