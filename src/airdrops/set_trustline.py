@@ -107,7 +107,7 @@ def mass_trust_line(path_to_csv: str, skip_already_set: bool, currency: str, val
                 if debug or __debug:
                     print(colored(text=f'Traceback: {traceback.format_exc()}', color='red'))
                 continue
-            if float(xrp_balance) > 2:
+            if float(xrp_balance) > 2 and not value == 0:
                 try:
                     _trust_line = set_trust_line(XRP_MAIN_CLIENT, wallet, currency, str(value), issuer)
                     result = _trust_line.result.get("meta").get("TransactionResult")
@@ -135,6 +135,32 @@ def mass_trust_line(path_to_csv: str, skip_already_set: bool, currency: str, val
                     continue
             else:
                 print(colored(text=f'Insufficient Reserve For Setting Trustline', color='red'))
+        elif value == 0:
+            try:
+                _trust_line = set_trust_line(XRP_MAIN_CLIENT, wallet, currency, str(value), issuer)
+                result = _trust_line.result.get("meta").get("TransactionResult")
+
+                if _trust_line and result == 'tesSUCCESS':
+                    report.add_success()
+
+                    print(colored(
+                        text=f'Status: Success',
+                        color='green'
+                    ))
+
+                    sleep_time = randint(min_sleep_time, max_sleep_time)
+                    print(colored(text=f"Sleeping for {sleep_time} seconds. zZz...", color='blue'))
+                    time.sleep(sleep_time)
+                else:
+                    report.add_failed()
+                    print(colored(text=f'Failed: [Unknown Error] | [{result}]', color='red'))
+                    continue
+            except Exception as e:
+                report.add_failed()
+                print(colored(text=f'Error: {e}', color='red'))
+                if debug or __debug:
+                    print(colored(text=f'Traceback: {traceback.format_exc()}', color='red'))
+                continue
         else:
             report.add_failed()
             print(colored(text=f'Failed: [Trustline already set]', color='red'))
