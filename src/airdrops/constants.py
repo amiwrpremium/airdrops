@@ -1,6 +1,7 @@
 XRP_TESTNET_URL = "https://s.altnet.rippletest.net:51234/"
 XRPL_FOUNDATION = "https://xrplcluster.com/"
 
+
 CREATE_WALLET_TEXT = """
    _____                _        __          __   _ _      _   
   / ____|              | |       \ \        / /  | | |    | |  
@@ -11,6 +12,7 @@ CREATE_WALLET_TEXT = """
 
 
 """
+
 SET_TRUSTLINE_TEXT = """
    _____      _     _______             _   _ _            
   / ____|    | |   |__   __|           | | | (_)           
@@ -21,6 +23,7 @@ SET_TRUSTLINE_TEXT = """
                                                            
                                                            
 """
+
 CREATE_ORDER_TEXT = """
    _____                _          ____          _           
   / ____|              | |        / __ \        | |          
@@ -32,4 +35,14 @@ CREATE_ORDER_TEXT = """
 
 """
 
-# TODO Add public servers to sdk
+CANCEL_ORDER_TEXT = """
+
+  ______                       _     _____           _             
+ / _____)                     | |   / ___ \         | |            
+| /      ____ ____   ____ ____| |  | |   | | ____ _ | | ____  ____ 
+| |     / _  |  _ \ / ___) _  ) |  | |   | |/ ___) || |/ _  )/ ___)
+| \____( ( | | | | ( (__( (/ /| |  | |___| | |  ( (_| ( (/ /| |    
+ \______)_||_|_| |_|\____)____)_|   \_____/|_|   \____|\____)_|    
+   
+                                                                   
+"""

@@ -232,7 +232,7 @@ def enter(__debug: bool = False):
 
     print(colored(text=CREATE_ORDER_TEXT, color='cyan'))
 
-    path_to_csv = input('Enter path to csv file: ')
+    path_to_csv = input('Enter path to csv file: ').strip()
 
     side = input('Enter side (buy/sell): ')
 

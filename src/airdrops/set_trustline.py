@@ -135,7 +135,7 @@ def enter(__debug: bool = False):
 
     print(colored(text=SET_TRUSTLINE_TEXT, color='cyan'))
 
-    path_to_csv = input('Enter path to csv file: ')
+    path_to_csv = input('Enter path to csv file: ').strip()
 
     currency = input('Enter currency: ')
 
