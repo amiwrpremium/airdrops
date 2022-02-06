@@ -61,7 +61,6 @@ def mass_trust_line(path_to_csv: str, skip_already_set: bool, currency: str, val
     print(
         colored(
             text=f'{path_to_csv=}\n'
-                 f'{skip_already_set=}\n'
                  f'{currency=}\n'
                  f'{value=}\n'
                  f'{issuer=}\n'
@@ -97,7 +96,7 @@ def mass_trust_line(path_to_csv: str, skip_already_set: bool, currency: str, val
                 print(colored(text=f'Traceback: {traceback.format_exc()}', color='red'))
             continue
 
-        if ((_is_set and value == 0) or (not _is_set and value > 0)) or skip_already_set:
+        if ((_is_set and value == 0) or (not _is_set and value > 0)) and skip_already_set:
             try:
                 balance = get_account_info(
                     XRP_MAIN_CLIENT,
@@ -167,14 +166,10 @@ def enter(__debug: bool = False):
 
     skip_already_set = input('Skip already set trustlines? (y/n): ')
 
-    if skip_already_set.lower() == 'y' or skip_already_set.lower() == 'yes':
+    if skip_already_set.lower() == 'y':
         skip = True
-    elif skip_already_set.lower() == 'n' or skip_already_set.lower() == 'no':
-        skip = False
     else:
         skip = False
-        print(colored(text='Invalid input.', color='red'))
-        exit(1)
 
     currency = input('Enter currency: ')
 
