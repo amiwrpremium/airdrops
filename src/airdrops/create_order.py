@@ -96,6 +96,7 @@ def mass_create_order_buy(path_to_csv: str, min_taker_gets_xrp: Union[int, float
             continue
 
         taker_gets_xrp = round(uniform(min_taker_gets_xrp, max_taker_gets_xrp), 4)
+        print(colored(text=f'{taker_gets_xrp=}', color='cyan'))
 
         try:
             _create_offer = create_offer_buy(
@@ -182,6 +183,7 @@ def mass_create_order_sell(path_to_csv: str, min_taker_pays_xrp: Union[int, floa
             continue
 
         taker_pays_xrp = round(uniform(min_taker_pays_xrp, max_taker_pays_xrp), 4)
+        print(colored(text=f'{taker_pays_xrp=}', color='cyan'))
 
         try:
             if balance and balance > 0:
