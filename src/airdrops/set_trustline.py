@@ -10,7 +10,7 @@ from random import randint
 from colorama import init as colorama_init
 from termcolor import colored
 
-from xrpy import Wallet, JsonRpcClient, set_trust_line, get_account_trustlines, get_account_info
+from xrpy import Wallet, JsonRpcClient, set_trust_line, get_account_trustlines
 
 
 if __name__ == '__main__':
@@ -56,11 +56,16 @@ def is_trustline_set(client: JsonRpcClient, address: str, currency: str) -> bool
     return False
 
 
-def mass_trust_line(path_to_csv: str, skip_already_set: bool, currency: str, value: int, issuer: str,
+def mass_trust_line(path_to_csv: str, currency: str, value: int, issuer: str,
                     min_sleep_time: int = 0, max_sleep_time: int = 0, __debug: bool = False):
     print(
         colored(
-            text=f'{path_to_csv=} | {currency=} | {value=} | {issuer=}',
+            text=f'{path_to_csv=}\n'
+                 f'{currency=}\n'
+                 f'{value=}\n'
+                 f'{issuer=}\n'
+                 f'{min_sleep_time=}\n'
+                 f'{max_sleep_time=}\n\n',
             color='cyan'
         )
     )
@@ -91,20 +96,25 @@ def mass_trust_line(path_to_csv: str, skip_already_set: bool, currency: str, val
                 print(colored(text=f'Traceback: {traceback.format_exc()}', color='red'))
             continue
 
-        if ((_is_set and value == 0) or (not _is_set and value > 0)) and skip_already_set:
+        if (_is_set and value == 0) or (not _is_set and value > 0):
             try:
-                balance = get_account_info(
-                    XRP_MAIN_CLIENT,
-                    wallet.classic_address
-                ).result.get("account_data").get("Balance")
+                _trust_line = set_trust_line(XRP_MAIN_CLIENT, wallet, currency, str(value), issuer)
+                result = _trust_line.result.get("meta").get("TransactionResult")
 
-                try:
-                    xrp_balance = int(balance)/1000000
-                except ValueError:
+                if _trust_line and result == 'tesSUCCESS':
+                    report.add_success()
+
+                    print(colored(
+                        text=f'Status: Success',
+                        color='green'
+                    ))
+
+                    sleep_time = randint(min_sleep_time, max_sleep_time)
+                    print(colored(text=f"Sleeping for {sleep_time} seconds. zZz...", color='blue'))
+                    time.sleep(sleep_time)
+                else:
                     report.add_failed()
-                    print(colored(text=f'Error: Invalid Balance: {balance}', color='red'))
-                    if debug or __debug:
-                        print(colored(text=f'Traceback: {traceback.format_exc()}', color='red'))
+                    print(colored(text=f'Failed: [Unknown Error] | [{result}]', color='red'))
                     continue
 
             except Exception as e:
@@ -113,38 +123,6 @@ def mass_trust_line(path_to_csv: str, skip_already_set: bool, currency: str, val
                 if debug or __debug:
                     print(colored(text=f'Traceback: {traceback.format_exc()}', color='red'))
                 continue
-
-            if float(xrp_balance) > 2:
-                try:
-                    _trust_line = set_trust_line(XRP_MAIN_CLIENT, wallet, currency, str(value), issuer)
-                    result = _trust_line.result.get("meta").get("TransactionResult")
-
-                    if _trust_line and result == 'tesSUCCESS':
-                        report.add_success()
-
-                        print(colored(
-                            text=f'Status: Success',
-                            color='green'
-                        ))
-
-                        sleep_time = randint(min_sleep_time, max_sleep_time)
-                        print(colored(text=f"Sleeping for {sleep_time} seconds. zZz...", color='blue'))
-                        time.sleep(sleep_time)
-                    else:
-                        report.add_failed()
-                        print(colored(text=f'Failed: [Unknown Error] | [{result}]', color='red'))
-                        continue
-
-                except Exception as e:
-                    report.add_failed()
-                    print(colored(text=f'Error: {e}', color='red'))
-                    if debug or __debug:
-                        print(colored(text=f'Traceback: {traceback.format_exc()}', color='red'))
-                    continue
-
-            else:
-                print(colored(text=f'Insufficient Reserve For Setting Trustline', color='red'))
-
         else:
             report.add_failed()
             print(colored(text=f'Failed: [Trustline already set]', color='red'))
@@ -158,13 +136,6 @@ def enter(__debug: bool = False):
     print(colored(text=SET_TRUSTLINE_TEXT, color='cyan'))
 
     path_to_csv = input('Enter path to csv file: ')
-
-    skip_already_set = input('Skip already set trustlines? (y/n): ')
-
-    if skip_already_set.lower() == 'y':
-        skip = True
-    else:
-        skip = False
 
     currency = input('Enter currency: ')
 
@@ -193,7 +164,7 @@ def enter(__debug: bool = False):
 
     clear()
 
-    mass_trust_line(path_to_csv, skip, currency, value, issuer, min_sleep_time, max_sleep_time, debug or __debug)
+    mass_trust_line(path_to_csv, currency, value, issuer, min_sleep_time, max_sleep_time, debug or __debug)
 
     print('\n\n')
     print(report.get_pretty_report())
