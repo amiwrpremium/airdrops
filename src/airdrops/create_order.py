@@ -95,7 +95,7 @@ def mass_create_order_buy(path_to_csv: str, min_taker_gets_xrp: Union[int, float
                 print(colored(text=f'Traceback: {traceback.format_exc()}', color='red'))
             continue
 
-        taker_gets_xrp = round(uniform(min_taker_gets_xrp, max_taker_gets_xrp), 4)
+        taker_gets_xrp = round(uniform(min_taker_gets_xrp, max_taker_gets_xrp), randint(1, 5))
         print(colored(text=f'{taker_gets_xrp=}', color='cyan'))
 
         try:
@@ -182,7 +182,7 @@ def mass_create_order_sell(path_to_csv: str, min_taker_pays_xrp: Union[int, floa
                 print(colored(text=f'Traceback: {traceback.format_exc()}', color='red'))
             continue
 
-        taker_pays_xrp = round(uniform(min_taker_pays_xrp, max_taker_pays_xrp), 4)
+        taker_pays_xrp = round(uniform(min_taker_pays_xrp, max_taker_pays_xrp), randint(1, 5))
         print(colored(text=f'{taker_pays_xrp=}', color='cyan'))
 
         try:
