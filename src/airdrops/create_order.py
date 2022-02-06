@@ -7,7 +7,7 @@ import traceback
 
 from typing import Union
 
-from random import randint, uniform
+from random import randint
 
 from colorama import init as colorama_init
 from termcolor import colored
@@ -59,8 +59,7 @@ def get_trustline_balance(client: JsonRpcClient, address: str, currency: str) ->
 
 
 def mass_create_order_buy(path_to_csv: str, taker_gets_xrp: Union[int, float], taker_pays_currency: str,
-                          min_taker_pays_value: Union[float, int], max_taker_pays_value: Union[float, int],
-                          taker_pays_issuer: str, side: str,
+                          taker_pays_value: str, taker_pays_issuer: str, side: str,
                           min_sleep_time: int = 0, max_sleep_time: int = 0, __debug: bool = False):
 
     print(
@@ -68,8 +67,7 @@ def mass_create_order_buy(path_to_csv: str, taker_gets_xrp: Union[int, float], t
             text=f'{path_to_csv=}\n'
                  f'{taker_gets_xrp=}\n'
                  f'{taker_pays_currency=}\n'
-                 f'{min_taker_pays_value=}\n'
-                 f'{max_taker_pays_value=}\n'
+                 f'{taker_pays_value=}\n'
                  f'{taker_pays_issuer=}\n'
                  f'{side=}\n'
                  f'{min_sleep_time=}\n'
@@ -86,17 +84,7 @@ def mass_create_order_buy(path_to_csv: str, taker_gets_xrp: Union[int, float], t
     for data in wallet_data:
         print(colored(text=f'{data}', color='yellow'))
 
-        try:
-            wallet = Wallet(data[wallet_csv.seed_index], data[wallet_csv.sequence_index])
-        except Exception as e:
-            report.add_failed()
-            print(colored(text=f'Error: {e}', color='red'))
-            if debug or __debug:
-                print(colored(text=f'Traceback: {traceback.format_exc()}', color='red'))
-            continue
-
-        taker_pays_value = str(round(uniform(min_taker_pays_value, max_taker_pays_value), 6))
-        print(colored(text=f'{taker_pays_value=}', color='yellow'))
+        wallet = Wallet(data[wallet_csv.seed_index], data[wallet_csv.sequence_index])
 
         try:
             _create_offer = create_offer_buy(
@@ -138,8 +126,7 @@ def mass_create_order_buy(path_to_csv: str, taker_gets_xrp: Union[int, float], t
 
 
 def mass_create_order_sell(path_to_csv: str, taker_pays_xrp: Union[int, float], taker_gets_currency: str,
-                           min_taker_gets_value: Union[int, float], max_taker_gets_value: Union[int, float],
-                           taker_gets_issuer: str, side: str,
+                           taker_gets_value: str, taker_gets_issuer: str, side: str,
                            min_sleep_time: int = 0, max_sleep_time: int = 0, __debug: bool = False):
 
     print(
@@ -147,8 +134,7 @@ def mass_create_order_sell(path_to_csv: str, taker_pays_xrp: Union[int, float], 
             text=f'{path_to_csv=}\n'
                  f'{taker_pays_xrp=}\n'
                  f'{taker_gets_currency=}\n'
-                 f'{min_taker_gets_value=}\n'
-                 f'{max_taker_gets_value=}\n'
+                 f'{taker_gets_value=}\n'
                  f'{taker_gets_issuer=}\n'
                  f'{side=}\n'
                  f'{min_sleep_time=}\n'
@@ -182,9 +168,6 @@ def mass_create_order_sell(path_to_csv: str, taker_pays_xrp: Union[int, float], 
             if debug or __debug:
                 print(colored(text=f'Traceback: {traceback.format_exc()}', color='red'))
             continue
-
-        taker_gets_value = str(round(uniform(min_taker_gets_value, max_taker_gets_value), 6))
-        print(colored(text=f'{taker_gets_value=}', color='yellow'))
 
         try:
             if balance and balance > 0:
@@ -260,14 +243,8 @@ def enter(__debug: bool = False):
             sys.exit()
 
         taker_pays_currency = input('Enter taker pays currency: ')
+        taker_pays_value = input('Enter taker pays value: ')
         taker_pays_issuer = input('Enter taker pays issuer: ')
-
-        try:
-            min_taker_pays_value = float(input('Enter min taker pays value: '))
-            max_taker_pays_value = float(input('Enter max taker pays value: '))
-        except ValueError:
-            print(colored(text='\n\ntaker pays value must be number', color='red'))
-            sys.exit()
 
         clear()
 
@@ -275,8 +252,7 @@ def enter(__debug: bool = False):
             path_to_csv,
             taker_gets_xrp,
             taker_pays_currency,
-            min_taker_pays_value,
-            max_taker_pays_value,
+            taker_pays_value,
             taker_pays_issuer,
             side,
             min_sleep_time,
@@ -292,14 +268,8 @@ def enter(__debug: bool = False):
             sys.exit()
 
         taker_gets_currency = input('Enter taker gets currency: ')
+        taker_gets_value = input('Enter taker gets value: ')
         taker_gets_issuer = input('Enter taker gets issuer: ')
-
-        try:
-            min_taker_gets_value = float(input('Enter min taker gets value: '))
-            max_taker_gets_value = float(input('Enter max taker gets value: '))
-        except ValueError:
-            print(colored(text='\n\ntaker pays value must be number', color='red'))
-            sys.exit()
 
         clear()
 
@@ -307,8 +277,7 @@ def enter(__debug: bool = False):
             path_to_csv,
             taker_pays_xrp,
             taker_gets_currency,
-            min_taker_gets_value,
-            max_taker_gets_value,
+            taker_gets_value,
             taker_gets_issuer,
             side,
             min_sleep_time,
