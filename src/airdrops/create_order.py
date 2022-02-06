@@ -7,7 +7,7 @@ import traceback
 
 from typing import Union
 
-from random import randint
+from random import randint, uniform
 
 from colorama import init as colorama_init
 from termcolor import colored
@@ -58,14 +58,16 @@ def get_trustline_balance(client: JsonRpcClient, address: str, currency: str) ->
     return 0
 
 
-def mass_create_order_buy(path_to_csv: str, taker_gets_xrp: Union[int, float], taker_pays_currency: str,
+def mass_create_order_buy(path_to_csv: str, min_taker_gets_xrp: Union[int, float], max_taker_gets_xrp: Union[int, float],
+                          taker_pays_currency: str,
                           taker_pays_value: str, taker_pays_issuer: str, side: str,
                           min_sleep_time: int = 0, max_sleep_time: int = 0, __debug: bool = False):
 
     print(
         colored(
             text=f'{path_to_csv=}\n'
-                 f'{taker_gets_xrp=}\n'
+                 f'{min_taker_gets_xrp=}\n'
+                 f'{max_taker_gets_xrp=}\n'
                  f'{taker_pays_currency=}\n'
                  f'{taker_pays_value=}\n'
                  f'{taker_pays_issuer=}\n'
@@ -84,7 +86,16 @@ def mass_create_order_buy(path_to_csv: str, taker_gets_xrp: Union[int, float], t
     for data in wallet_data:
         print(colored(text=f'{data}', color='yellow'))
 
-        wallet = Wallet(data[wallet_csv.seed_index], data[wallet_csv.sequence_index])
+        try:
+            wallet = Wallet(data[wallet_csv.seed_index], data[wallet_csv.sequence_index])
+        except Exception as e:
+            report.add_failed()
+            print(colored(text=f'Error: {e}', color='red'))
+            if debug or __debug:
+                print(colored(text=f'Traceback: {traceback.format_exc()}', color='red'))
+            continue
+
+        taker_gets_xrp = round(uniform(min_taker_gets_xrp, max_taker_gets_xrp), 4)
 
         try:
             _create_offer = create_offer_buy(
@@ -125,14 +136,15 @@ def mass_create_order_buy(path_to_csv: str, taker_gets_xrp: Union[int, float], t
             continue
 
 
-def mass_create_order_sell(path_to_csv: str, taker_pays_xrp: Union[int, float], taker_gets_currency: str,
-                           taker_gets_value: str, taker_gets_issuer: str, side: str,
+def mass_create_order_sell(path_to_csv: str, min_taker_pays_xrp: Union[int, float], max_taker_pays_xrp: Union[int, float],
+                           taker_gets_currency: str, taker_gets_value: str, taker_gets_issuer: str, side: str,
                            min_sleep_time: int = 0, max_sleep_time: int = 0, __debug: bool = False):
 
     print(
         colored(
             text=f'{path_to_csv=}\n'
-                 f'{taker_pays_xrp=}\n'
+                 f'{min_taker_pays_xrp=}\n'
+                 f'{max_taker_pays_xrp=}\n'
                  f'{taker_gets_currency=}\n'
                  f'{taker_gets_value=}\n'
                  f'{taker_gets_issuer=}\n'
@@ -168,6 +180,8 @@ def mass_create_order_sell(path_to_csv: str, taker_pays_xrp: Union[int, float], 
             if debug or __debug:
                 print(colored(text=f'Traceback: {traceback.format_exc()}', color='red'))
             continue
+
+        taker_pays_xrp = round(uniform(min_taker_pays_xrp, max_taker_pays_xrp), 4)
 
         try:
             if balance and balance > 0:
@@ -237,7 +251,8 @@ def enter(__debug: bool = False):
 
     if side.lower() == 'buy':
         try:
-            taker_gets_xrp = float(input('Enter taker gets XRP: '))
+            min_taker_gets_xrp = float(input('Enter min taker gets XRP: '))
+            max_taker_gets_xrp = float(input('Enter max taker gets XRP: '))
         except ValueError:
             print(colored(text='\n\ntaker gets XRP must be an float', color='red'))
             sys.exit()
@@ -250,7 +265,8 @@ def enter(__debug: bool = False):
 
         mass_create_order_buy(
             path_to_csv,
-            taker_gets_xrp,
+            min_taker_gets_xrp,
+            max_taker_gets_xrp,
             taker_pays_currency,
             taker_pays_value,
             taker_pays_issuer,
@@ -262,7 +278,8 @@ def enter(__debug: bool = False):
 
     elif side.lower() == 'sell':
         try:
-            taker_pays_xrp = float(input('Enter taker pays XRP: '))
+            min_taker_pays_xrp = float(input('Enter min taker pays XRP: '))
+            max_taker_pays_xrp = float(input('Enter max taker pays XRP: '))
         except ValueError:
             print(colored(text='\n\nError: taker gets XRP must be an float', color='red'))
             sys.exit()
@@ -275,7 +292,8 @@ def enter(__debug: bool = False):
 
         mass_create_order_sell(
             path_to_csv,
-            taker_pays_xrp,
+            min_taker_pays_xrp,
+            max_taker_pays_xrp,
             taker_gets_currency,
             taker_gets_value,
             taker_gets_issuer,
