@@ -295,8 +295,8 @@ def enter(__debug: bool = False):
         taker_gets_issuer = input('Enter taker gets issuer: ')
 
         try:
-            min_taker_gets_value = float(input('Enter min taker pays value: '))
-            max_taker_gets_value = float(input('Enter max taker pays value: '))
+            min_taker_gets_value = float(input('Enter min taker gets value: '))
+            max_taker_gets_value = float(input('Enter max taker gets value: '))
         except ValueError:
             print(colored(text='\n\ntaker pays value must be number', color='red'))
             sys.exit()
