@@ -136,7 +136,7 @@ def mass_create_order_buy(path_to_csv: str, min_taker_gets_xrp: Union[int, float
                 print(colored(text=f'Traceback: {traceback.format_exc()}', color='red'))
             continue
     retry_question = input("Should i Retry This Whole Operation? (y or n) ")
-    if retry_question == "y":
+    if retry_question.lower() == "y":
         mass_create_order_buy(path_to_csv, min_taker_gets_xrp, max_taker_gets_xrp, taker_pays_currency, taker_pays_value, taker_pays_issuer, side, min_sleep_time, max_sleep_time, __debug)
     else:
         pass
@@ -229,7 +229,7 @@ def mass_create_order_sell(path_to_csv: str, min_taker_pays_xrp: Union[int, floa
                 print(colored(text=f'Traceback: {traceback.format_exc()}', color='red'))
             continue
     retry_question = input("Should i Retry This Whole Operation? (y or n) ")
-    if retry_question == "y":
+    if retry_question.lower() == "y":
         mass_create_order_sell(path_to_csv, min_taker_pays_xrp, max_taker_pays_xrp, taker_gets_currency, taker_gets_value, taker_gets_issuer, side, min_sleep_time, max_sleep_time, __debug)
     else:
         pass
