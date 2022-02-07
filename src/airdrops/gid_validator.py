@@ -71,7 +71,7 @@ def mass_validate(path_to_csv: str, __debug: bool = False):
         )
     )
 
-    wallet_csv_write = WalletCSV(f'NO-{os.path.basename(path_to_csv)}.csv')
+    wallet_csv_write = WalletCSV(f'NO-{os.path.basename(path_to_csv)}')
     wallet_csv_write.write_headers()
 
     wallet_csv_read = WalletCSV(path_to_csv)

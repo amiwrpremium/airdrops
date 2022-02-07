@@ -9,6 +9,7 @@ from src.airdrops import create_wallet_entrance
 from src.airdrops import set_trustline_entrance
 from src.airdrops import create_order_entrance
 from src.airdrops import cancel_order_entrance
+from src.airdrops import gid_validator_entrance
 
 
 parser = argparse.ArgumentParser(description='Set trustline for airdrop wallets')
@@ -38,6 +39,8 @@ def decide(option: int):
         create_order_entrance.enter(main_debug)
     elif option == 4:
         cancel_order_entrance.enter(main_debug)
+    elif option == 5:
+        gid_validator_entrance.enter(main_debug)
     elif option == 0:
         sys.exit()
 
@@ -48,6 +51,7 @@ def enter():
         "[02] \t [Set Trustline]\n"
         "[03] \t [Create Order]\n"
         "[04] \t [Cancel Order]\n"
+        "[05] \t [Validate GID]\n"
         "[00] \t [Exit]\n"
     )
     option = int(input("Enter option: "))
