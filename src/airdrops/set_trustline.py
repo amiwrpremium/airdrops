@@ -127,7 +127,13 @@ def mass_trust_line(path_to_csv: str, currency: str, value: int, issuer: str,
             report.add_failed()
             print(colored(text=f'Failed: [Trustline already set]', color='red'))
             continue
-
+    retry_question = input("Should i Retry This Whole Operation? ( y or n) ")
+    if retry_question == "y":
+        mass_trust_line(currency, value, issuer, min_sleep_time, max_sleep_time, __debug)
+    elif retry_question == "n":
+        pass
+    else:
+        pass
 
 def enter(__debug: bool = False):
     if debug or __debug:
