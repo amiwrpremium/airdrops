@@ -16,11 +16,11 @@ from termcolor import colored
 from xrpy import Wallet, JsonRpcClient, create_offer_buy, create_offer_sell, get_account_trustlines
 
 if __name__ == '__main__':
-    from constants import XRPL_FOUNDATION, CREATE_ORDER_TEXT
+    from constants import XRPL_FOUNDATION, CREATE_ORDER_TEXT, DONATION_TEXT, DONATION_REQ, WALLETS
     from csv_func import WalletCSV
     from utils import Report
 else:
-    from .constants import XRPL_FOUNDATION, CREATE_ORDER_TEXT
+    from .constants import XRPL_FOUNDATION, CREATE_ORDER_TEXT, DONATION_TEXT, DONATION_REQ, WALLETS
     from .csv_func import WalletCSV
     from .utils import Report
 
@@ -45,10 +45,19 @@ def clear():
         pass
 
 
+def print_donation():
+    print(
+        colored(text=DONATION_TEXT, color='yellow', attrs=['blink', 'bold']) + "\n" +
+        colored(text=DONATION_REQ, color='cyan') + "\n\n" +
+        colored(text=WALLETS, color='white')
+    )
+
+
 def print_end_report():
     print('\n\n')
     print(report.get_pretty_report())
-    print('\n\n')
+    print('\n\n\n')
+    print_donation()
 
 
 def get_trustline_balance(client: JsonRpcClient, address: str, currency: str) -> Union[float, int]:

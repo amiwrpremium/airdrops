@@ -57,3 +57,31 @@ VALIDATE_GID_TEXT = """
                                                                
                                                                
 """
+
+DONATION_TEXT = """
+ _____                         _             
+(____ \                   _   (_)            
+ _   \ \ ___  ____   ____| |_  _  ___  ____  
+| |   | / _ \|  _ \ / _  |  _)| |/ _ \|  _ \ 
+| |__/ / |_| | | | ( ( | | |__| | |_| | | | |
+|_____/ \___/|_| |_|\_||_|\___)_|\___/|_| |_|
+                                             
+
+"""
+
+WALLETS = """
+BTC: \t "bc1qzcw66ahusuzths3pwt8vy9jcn7v8f79zj8lfkn",
+ETH: \t "0x3728bF71A19C32519197993461Aa67b89D0FDC85",
+BNB: \t "bnb1h5p82favshprv73f4ge977gf0zxxjazyxy2l4z",
+LTC: \t "ltc1qw0e7sla29z73f6w3spp3vv977wj76mhvx4axn0",
+DASH: \t "Xx5qGfbDcLtC7bMQSMuuMKoY1aYMLqaAtD",
+XRP: \t "rPkkWiu2fgoJTgeS6xgQ39txEjcKuTVhUt",
+TRX: \t "TPxwzKehTVVqbUruiM8jUsJXPYEEEsoY44",
+USDT: \t "TPxwzKehTVVqbUruiM8jUsJXPYEEEsoY44",
+"""
+
+
+DONATION_REQ = "If you like this project, \n" \
+               "please consider donating to the project \n" \
+               "so I can keep developing and working on project. \n\n" \
+               "Thank you!"

@@ -15,11 +15,11 @@ from xrpy import Wallet, JsonRpcClient, get_account_offers, cancel_offer
 
 
 if __name__ == '__main__':
-    from constants import XRPL_FOUNDATION, CANCEL_ORDER_TEXT
+    from constants import XRPL_FOUNDATION, CANCEL_ORDER_TEXT, DONATION_TEXT, DONATION_REQ, WALLETS
     from csv_func import WalletCSV
     from utils import Report
 else:
-    from .constants import XRPL_FOUNDATION, CANCEL_ORDER_TEXT
+    from .constants import XRPL_FOUNDATION, CANCEL_ORDER_TEXT, DONATION_TEXT, DONATION_REQ, WALLETS
     from .csv_func import WalletCSV
     from .utils import Report
 
@@ -44,10 +44,19 @@ def clear():
         pass
 
 
+def print_donation():
+    print(
+        colored(text=DONATION_TEXT, color='yellow', attrs=['blink', 'bold']) + "\n" +
+        colored(text=DONATION_REQ, color='cyan') + "\n\n" +
+        colored(text=WALLETS, color='white')
+    )
+
+
 def print_end_report():
     print('\n\n')
     print(report.get_pretty_report())
-    print('\n\n')
+    print('\n\n\n')
+    print_donation()
 
 
 def get_sequences(address: str) -> List[int]:
