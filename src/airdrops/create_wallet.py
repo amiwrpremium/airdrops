@@ -46,6 +46,12 @@ def clear():
         pass
 
 
+def print_end_report():
+    print('\n\n')
+    print(report.get_pretty_report())
+    print('\n\n')
+
+
 def mass_wallet_creator(count: int = 10, min_sleep_time: int = 0, max_sleep_time: int = 0, __debug: bool = False):
     wallet_csv = WalletCSV(f'wallets-{str(uuid4())}.csv')
     wallet_csv.write_headers()
@@ -117,10 +123,11 @@ def enter(__debug: bool = False):
 
     clear()
 
-    mass_wallet_creator(count, min_sleep_time, max_sleep_time, debug or __debug)
-
-    print('\n\n')
-    print(report.get_pretty_report())
+    try:
+        mass_wallet_creator(count, min_sleep_time, max_sleep_time, debug or __debug)
+        print_end_report()
+    except KeyboardInterrupt as e:
+        print_end_report()
 
 
 if __name__ == '__main__':

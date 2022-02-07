@@ -43,6 +43,12 @@ def clear():
         pass
 
 
+def print_end_report():
+    print('\n\n')
+    print(report.get_pretty_report())
+    print('\n\n')
+
+
 def is_trustline_set(client: JsonRpcClient, address: str, currency: str) -> bool:
     all_trust_lines = get_account_trustlines(client, address)
     lines = all_trust_lines.result.get('lines')
@@ -164,10 +170,11 @@ def enter(__debug: bool = False):
 
     clear()
 
-    mass_trust_line(path_to_csv, currency, value, issuer, min_sleep_time, max_sleep_time, debug or __debug)
-
-    print('\n\n')
-    print(report.get_pretty_report())
+    try:
+        mass_trust_line(path_to_csv, currency, value, issuer, min_sleep_time, max_sleep_time, debug or __debug)
+        print_end_report()
+    except KeyboardInterrupt as e:
+        print_end_report()
 
 
 if __name__ == '__main__':

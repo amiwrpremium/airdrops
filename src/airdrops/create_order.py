@@ -45,6 +45,12 @@ def clear():
         pass
 
 
+def print_end_report():
+    print('\n\n')
+    print(report.get_pretty_report())
+    print('\n\n')
+
+
 def get_trustline_balance(client: JsonRpcClient, address: str, currency: str) -> Union[float, int]:
     all_trust_lines = get_account_trustlines(client, address)
     lines = all_trust_lines.result.get('lines')
@@ -265,18 +271,23 @@ def enter(__debug: bool = False):
 
         clear()
 
-        mass_create_order_buy(
-            path_to_csv,
-            min_taker_gets_xrp,
-            max_taker_gets_xrp,
-            taker_pays_currency,
-            taker_pays_value,
-            taker_pays_issuer,
-            side,
-            min_sleep_time,
-            max_sleep_time,
-            debug or __debug
-        )
+        try:
+            mass_create_order_buy(
+                path_to_csv,
+                min_taker_gets_xrp,
+                max_taker_gets_xrp,
+                taker_pays_currency,
+                taker_pays_value,
+                taker_pays_issuer,
+                side,
+                min_sleep_time,
+                max_sleep_time,
+                debug or __debug
+            )
+            print_end_report()
+
+        except KeyboardInterrupt as e:
+            print_end_report()
 
     elif side.lower() == 'sell':
         try:
@@ -292,21 +303,23 @@ def enter(__debug: bool = False):
 
         clear()
 
-        mass_create_order_sell(
-            path_to_csv,
-            min_taker_pays_xrp,
-            max_taker_pays_xrp,
-            taker_gets_currency,
-            taker_gets_value,
-            taker_gets_issuer,
-            side,
-            min_sleep_time,
-            max_sleep_time,
-            debug or __debug
-        )
+        try:
+            mass_create_order_sell(
+                path_to_csv,
+                min_taker_pays_xrp,
+                max_taker_pays_xrp,
+                taker_gets_currency,
+                taker_gets_value,
+                taker_gets_issuer,
+                side,
+                min_sleep_time,
+                max_sleep_time,
+                debug or __debug
+            )
+            print_end_report()
 
-        print('\n\n')
-        print(report.get_pretty_report())
+        except KeyboardInterrupt as e:
+            print_end_report()
 
     else:
         print(colored(text='\n\nInvalid side', color='red'))

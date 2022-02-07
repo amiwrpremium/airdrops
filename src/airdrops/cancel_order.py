@@ -44,6 +44,12 @@ def clear():
         pass
 
 
+def print_end_report():
+    print('\n\n')
+    print(report.get_pretty_report())
+    print('\n\n')
+
+
 def get_sequences(address: str) -> List[int]:
     data = []
 
@@ -130,7 +136,11 @@ def enter(__debug: bool = False):
 
     clear()
 
-    cancel_all_orders(path_to_csv, __debug)
+    try:
+        cancel_all_orders(path_to_csv, __debug)
+        print_end_report()
+    except KeyboardInterrupt as e:
+        print_end_report()
 
 
 if __name__ == '__main__':
