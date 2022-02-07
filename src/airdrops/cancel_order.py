@@ -131,6 +131,7 @@ def cancel_all_orders(path_to_csv: str, __debug: bool = False):
                         print(colored(text=f'Traceback: {traceback.format_exc()}', color='red'))
                     continue
         else:
+            report.failed()
             print(f'No offers found for {wallet.classic_address}')
             continue
 
