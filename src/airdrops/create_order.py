@@ -2,6 +2,8 @@ import sys
 import os
 import time
 
+import math
+
 import argparse
 import traceback
 
@@ -14,6 +16,7 @@ from termcolor import colored
 
 
 from xrpy import Wallet, JsonRpcClient, create_offer_buy, create_offer_sell, get_account_trustlines
+
 
 if __name__ == '__main__':
     from constants import XRPL_FOUNDATION, CREATE_ORDER_TEXT, DONATION_TEXT, DONATION_REQ, WALLETS
@@ -58,6 +61,12 @@ def print_end_report():
     print(report.get_pretty_report())
     print('\n\n\n')
     print_donation()
+
+
+def random_round_point(num: float) -> int:
+    min_rand = abs(int(math.log10(abs(num)))) + 1
+    max_rand = 6
+    return randint(min_rand, max_rand)
 
 
 def get_trustline_balance(client: JsonRpcClient, address: str, currency: str) -> Union[float, int]:
@@ -110,7 +119,7 @@ def mass_create_order_buy(path_to_csv: str, min_taker_gets_xrp: Union[int, float
                 print(colored(text=f'Traceback: {traceback.format_exc()}', color='red'))
             continue
 
-        taker_gets_xrp = round(uniform(min_taker_gets_xrp, max_taker_gets_xrp), randint(1, 5))
+        taker_gets_xrp = round(uniform(min_taker_gets_xrp, max_taker_gets_xrp), random_round_point(min_taker_gets_xrp))
         print(colored(text=f'{taker_gets_xrp=}', color='cyan'))
 
         try:
@@ -197,7 +206,7 @@ def mass_create_order_sell(path_to_csv: str, min_taker_pays_xrp: Union[int, floa
                 print(colored(text=f'Traceback: {traceback.format_exc()}', color='red'))
             continue
 
-        taker_pays_xrp = round(uniform(min_taker_pays_xrp, max_taker_pays_xrp), randint(1, 5))
+        taker_pays_xrp = round(uniform(min_taker_pays_xrp, max_taker_pays_xrp), random_round_point(min_taker_pays_xrp))
         print(colored(text=f'{taker_pays_xrp=}', color='cyan'))
 
         try:
