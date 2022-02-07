@@ -33,7 +33,6 @@ debug = True if args.debug else False
 
 colorama_init()
 XRP_TEST_CLIENT = JsonRpcClient(XRP_TESTNET_URL)
-
 report = Report()
 
 
