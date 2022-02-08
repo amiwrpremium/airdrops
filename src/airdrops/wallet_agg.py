@@ -95,6 +95,8 @@ def enter(__debug: bool = False):
 
     all_csv_files = []
 
+    print(f'Enter path to csv files you want to aggregate\n(Enter blank when done)\n\n')
+
     while True:
         file_path = input("Enter: ").strip()
         if file_path.isspace() or file_path == "":
