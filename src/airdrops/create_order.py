@@ -212,7 +212,7 @@ def mass_create_order_sell(path_to_csv: str, min_taker_pays_xrp: Union[int, floa
         print(colored(text=f'{taker_pays_xrp=}', color='cyan'))
 
         if taker_gets_value == -1:
-            taker_gets_value = round(taker_pays_xrp * (percentage / 100), random_round_point(taker_pays_xrp))
+            taker_gets_value = float(balance * (percentage / 100))
             print(colored(text=f'{taker_gets_value=}', color='cyan'))
 
         try:
