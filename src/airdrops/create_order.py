@@ -162,7 +162,8 @@ def mass_create_order_buy(path_to_csv: str, min_taker_gets_xrp: Union[int, float
 
 
 def mass_create_order_sell(path_to_csv: str, min_taker_pays_xrp: Union[int, float], max_taker_pays_xrp: Union[int, float],
-                           taker_gets_currency: str, taker_gets_value: str, taker_gets_issuer: str, side: str,
+                           taker_gets_currency: str, taker_gets_value: Union[int, float], percentage: Union[int, float],
+                           taker_gets_issuer: str, side: str,
                            min_sleep_time: int = 0, max_sleep_time: int = 0, __debug: bool = False):
 
     print(
@@ -172,6 +173,7 @@ def mass_create_order_sell(path_to_csv: str, min_taker_pays_xrp: Union[int, floa
                  f'{max_taker_pays_xrp=}\n'
                  f'{taker_gets_currency=}\n'
                  f'{taker_gets_value=}\n'
+                 f'{percentage=}\n'
                  f'{taker_gets_issuer=}\n'
                  f'{side=}\n'
                  f'{min_sleep_time=}\n'
@@ -209,6 +211,10 @@ def mass_create_order_sell(path_to_csv: str, min_taker_pays_xrp: Union[int, floa
         taker_pays_xrp = round(uniform(min_taker_pays_xrp, max_taker_pays_xrp), random_round_point(min_taker_pays_xrp))
         print(colored(text=f'{taker_pays_xrp=}', color='cyan'))
 
+        if taker_gets_value == -1:
+            taker_gets_value = round(taker_pays_xrp * (percentage / 100), random_round_point(taker_pays_xrp))
+            print(colored(text=f'{taker_gets_value=}', color='cyan'))
+
         try:
             if balance and balance > 0:
                 _create_offer = create_offer_sell(
@@ -216,7 +222,7 @@ def mass_create_order_sell(path_to_csv: str, min_taker_pays_xrp: Union[int, floa
                     wallet,
                     taker_pays_xrp,
                     taker_gets_currency,
-                    taker_gets_value,
+                    str(taker_gets_value),
                     taker_gets_issuer,
                     'market'
                 )
@@ -316,8 +322,32 @@ def enter(__debug: bool = False):
             sys.exit()
 
         taker_gets_currency = input('Enter taker gets currency: ')
-        taker_gets_value = input('Enter taker gets value: ')
         taker_gets_issuer = input('Enter taker gets issuer: ')
+        taker_gets_decider = input('Enter taker gets decider (yolo/fixed): ')
+
+        if taker_gets_decider.lower().strip() == 'yolo':
+            try:
+                percentage = float(input('Enter percentage (0-100): '))
+                if percentage < 0 or percentage > 100:
+                    print(colored(text='\n\nPercentage must be between 0 and 100', color='red'))
+                    sys.exit()
+            except ValueError:
+                print(colored(text='\n\npercentage must be a float', color='red'))
+                sys.exit()
+
+            taker_gets_value = -1
+
+        elif taker_gets_decider.lower().strip() == 'fixed':
+            percentage = 100
+            try:
+                taker_gets_value = float(input('Enter taker gets value: '))
+            except ValueError:
+                print(colored(text='\n\ntaker pays value must be an float', color='red'))
+                sys.exit()
+
+        else:
+            print(colored(text='\n\nInvalid taker pays decider', color='red'))
+            sys.exit()
 
         clear()
 
@@ -328,6 +358,7 @@ def enter(__debug: bool = False):
                 max_taker_pays_xrp,
                 taker_gets_currency,
                 taker_gets_value,
+                percentage,
                 taker_gets_issuer,
                 side,
                 min_sleep_time,
