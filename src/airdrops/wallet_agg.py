@@ -105,7 +105,7 @@ def enter(__debug: bool = False):
             all_csv_files.append(file_path)
 
     try:
-        aggregator(all_csv_files, __debug)
+        aggregator(all_csv_files, __debug or debug)
         print_end_report()
     except KeyboardInterrupt:
         print_end_report()

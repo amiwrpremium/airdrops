@@ -147,7 +147,7 @@ def enter(__debug: bool = False):
     clear()
 
     try:
-        cancel_all_orders(path_to_csv, __debug)
+        cancel_all_orders(path_to_csv, __debug or debug)
         print_end_report()
     except KeyboardInterrupt as e:
         print_end_report()

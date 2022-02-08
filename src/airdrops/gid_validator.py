@@ -119,7 +119,7 @@ def enter(__debug: bool = False):
     path_to_csv = input('Enter path to csv file: ').strip()
 
     try:
-        mass_validate(path_to_csv, __debug)
+        mass_validate(path_to_csv, __debug or debug)
         print_end_report()
     except KeyboardInterrupt:
         print_end_report()
