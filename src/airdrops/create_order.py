@@ -201,6 +201,7 @@ def mass_create_order_sell(path_to_csv: str, min_taker_pays_xrp: Union[int, floa
 
         try:
             balance = get_trustline_balance(XRP_MAIN_CLIENT, wallet.classic_address, taker_gets_currency)
+            print(colored(text=f'{balance=}', color='cyan'))
         except Exception as e:
             report.add_failed()
             print(colored(text=f'Error: {e}', color='red'))
@@ -213,7 +214,7 @@ def mass_create_order_sell(path_to_csv: str, min_taker_pays_xrp: Union[int, floa
 
         if taker_gets_value == -1:
             taker_gets_value = float(balance * (percentage / 100))
-            print(colored(text=f'{taker_gets_value=}', color='cyan'))
+        print(colored(text=f'{taker_gets_value=}', color='cyan'))
 
         try:
             if balance and balance > 0:
