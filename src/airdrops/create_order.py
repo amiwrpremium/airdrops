@@ -258,6 +258,23 @@ def mass_create_order_sell(path_to_csv: str, min_taker_pays_xrp: Union[int, floa
                 print(colored(text=f'Traceback: {traceback.format_exc()}', color='red'))
             continue
 
+    try_again = input(colored(text='\n\nTry again? (y/n) ', color='cyan'))
+    if try_again.lower() == 'y':
+        clear()
+        mass_create_order_sell(
+            path_to_csv,
+            min_taker_pays_xrp,
+            max_taker_pays_xrp,
+            taker_gets_currency,
+            taker_gets_value,
+            percentage,
+            taker_gets_issuer,
+            side,
+            min_sleep_time,
+            max_sleep_time,
+            __debug
+        )
+
 
 def enter(__debug: bool = False):
     if debug or __debug:
