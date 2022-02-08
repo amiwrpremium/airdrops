@@ -213,8 +213,10 @@ def mass_create_order_sell(path_to_csv: str, min_taker_pays_xrp: Union[int, floa
         print(colored(text=f'{taker_pays_xrp=}', color='cyan'))
 
         if taker_gets_value == -1:
-            taker_gets_value = float(balance * (percentage / 100))
-        print(colored(text=f'{taker_gets_value=}', color='cyan'))
+            __taker_gets_value = float(balance * (percentage / 100))
+        else:
+            __taker_gets_value = taker_gets_value
+        print(colored(text=f'{__taker_gets_value=}', color='cyan'))
 
         try:
             if balance and balance > 0:
@@ -223,7 +225,7 @@ def mass_create_order_sell(path_to_csv: str, min_taker_pays_xrp: Union[int, floa
                     wallet,
                     taker_pays_xrp,
                     taker_gets_currency,
-                    str(taker_gets_value),
+                    str(__taker_gets_value),
                     taker_gets_issuer,
                     'market'
                 )
