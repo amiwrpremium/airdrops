@@ -14,7 +14,7 @@ from xrpy import Wallet
 
 
 if __name__ == '__main__':
-    from .constants import VALIDATE_GID_TEXT, DONATION_TEXT, DONATION_REQ, WALLETS
+    from constants import VALIDATE_GID_TEXT, DONATION_TEXT, DONATION_REQ, WALLETS
     from csv_func import WalletCSV
     from utils import Report
 else:
