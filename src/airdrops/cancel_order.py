@@ -135,6 +135,14 @@ def cancel_all_orders(path_to_csv: str, __debug: bool = False):
             print(f'No offers found for {wallet.classic_address}')
             continue
 
+    try_again = input(colored(text='\n\nTry again? (y/n) ', color='cyan'))
+    if try_again == 'y':
+        clear()
+        cancel_all_orders(
+            path_to_csv,
+            __debug
+        )
+
 
 def enter(__debug: bool = False):
     if debug or __debug:

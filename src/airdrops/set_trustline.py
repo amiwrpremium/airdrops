@@ -143,6 +143,19 @@ def mass_trust_line(path_to_csv: str, currency: str, value: int, issuer: str,
             print(colored(text=f'Failed: [Trustline already set]', color='red'))
             continue
 
+    try_again = input(colored(text='\n\nTry again? (y/n) ', color='cyan'))
+    if try_again.lower() == 'y':
+        clear()
+        mass_trust_line(
+            path_to_csv,
+            currency,
+            value,
+            issuer,
+            min_sleep_time,
+            max_sleep_time,
+            __debug
+        )
+
 
 def enter(__debug: bool = False):
     if debug or __debug:
