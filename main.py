@@ -11,6 +11,7 @@ from src.airdrops import create_order_entrance
 from src.airdrops import cancel_order_entrance
 from src.airdrops import gid_validator_entrance
 from src.airdrops import wallet_agg_entrance
+from src.airdrops import wallet_balance_entrance
 
 
 parser = argparse.ArgumentParser(description='Set trustline for airdrop wallets')
@@ -44,6 +45,8 @@ def decide(option: int):
         gid_validator_entrance.enter(main_debug)
     elif option == 6:
         wallet_agg_entrance.enter(main_debug)
+    elif option == 7:
+        wallet_balance_entrance.enter(main_debug)
     elif option == 0:
         sys.exit()
 
@@ -56,6 +59,7 @@ def enter():
         "[04] \t [Cancel Order]\n"
         "[05] \t [Validate GID]\n"
         "[06] \t [Wallet Aggregator]\n"
+        "[07] \t [Wallet Balance]\n"
         "[00] \t [Exit]\n"
     )
     option = int(input("Enter option: "))
