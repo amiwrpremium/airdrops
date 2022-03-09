@@ -11,15 +11,15 @@ from colorama import init as colorama_init
 from termcolor import colored
 
 
-from xrpy import Wallet, JsonRpcClient, get_account_offers, cancel_offer
+from xrpy import Wallet, XRPY
 
 
 if __name__ == '__main__':
-    from constants import XRPL_FOUNDATION, CANCEL_ORDER_TEXT, DONATION_TEXT, DONATION_REQ, WALLETS
+    from constants import CANCEL_ORDER_TEXT, DONATION_TEXT, DONATION_REQ, WALLETS
     from csv_func import WalletCSV
     from utils import Report
 else:
-    from .constants import XRPL_FOUNDATION, CANCEL_ORDER_TEXT, DONATION_TEXT, DONATION_REQ, WALLETS
+    from .constants import CANCEL_ORDER_TEXT, DONATION_TEXT, DONATION_REQ, WALLETS
     from .csv_func import WalletCSV
     from .utils import Report
 
@@ -31,7 +31,7 @@ debug = True if args.debug else False
 
 
 colorama_init()
-XRP_MAIN_CLIENT = JsonRpcClient(XRPL_FOUNDATION)
+xrpy = XRPY()
 report = Report()
 
 
@@ -62,7 +62,7 @@ def print_end_report():
 def get_sequences(address: str) -> List[int]:
     data = []
 
-    account_offers = get_account_offers(XRP_MAIN_CLIENT, address)
+    account_offers = xrpy.get_account_offers(address)
     offers = account_offers.result.get('offers')
 
     if offers and len(offers) > 0:
@@ -110,7 +110,7 @@ def cancel_all_orders(path_to_csv: str, __debug: bool = False):
         if all_sequences and len(all_sequences) > 0:
             for sequence in all_sequences:
                 try:
-                    cancel = cancel_offer(XRP_MAIN_CLIENT, wallet, sequence)
+                    cancel = xrpy.cancel_offer(wallet, sequence)
                     result = cancel.result.get("meta").get("TransactionResult")
                     if cancel and result == 'tesSUCCESS':
                         report.add_success()
@@ -157,7 +157,7 @@ def enter(__debug: bool = False):
     try:
         cancel_all_orders(path_to_csv, __debug or debug)
         print_end_report()
-    except KeyboardInterrupt as e:
+    except KeyboardInterrupt:
         print_end_report()
 
 

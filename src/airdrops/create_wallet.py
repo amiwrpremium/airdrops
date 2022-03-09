@@ -12,7 +12,7 @@ from random import randint
 from colorama import init as colorama_init
 from termcolor import colored
 
-from xrpy import create_wallet, Wallet, JsonRpcClient
+from xrpy import Wallet, XRPY
 
 
 if __name__ == '__main__':
@@ -32,7 +32,7 @@ debug = True if args.debug else False
 
 
 colorama_init()
-XRP_TEST_CLIENT = JsonRpcClient(XRP_TESTNET_URL)
+xrpy = XRPY(XRP_TESTNET_URL)
 report = Report()
 
 
@@ -78,7 +78,7 @@ def mass_wallet_creator(count: int = 10, min_sleep_time: int = 0, max_sleep_time
         try:
             print(colored(text=f'Trying To Create Wallet: [{i+1}/{count}]', color='yellow'))
 
-            wallet = create_wallet(XRP_TEST_CLIENT)
+            wallet = xrpy.create_wallet()
 
             if wallet and type(wallet) == Wallet and wallet.classic_address:
                 report.add_success()
@@ -134,7 +134,7 @@ def enter(__debug: bool = False):
     try:
         mass_wallet_creator(count, min_sleep_time, max_sleep_time, debug or __debug)
         print_end_report()
-    except KeyboardInterrupt as e:
+    except KeyboardInterrupt:
         print_end_report()
 
 

@@ -15,15 +15,15 @@ from colorama import init as colorama_init
 from termcolor import colored
 
 
-from xrpy import Wallet, JsonRpcClient, create_offer_buy, create_offer_sell, get_account_trustlines
+from xrpy import Wallet, XRPY
 
 
 if __name__ == '__main__':
-    from constants import XRPL_FOUNDATION, CREATE_ORDER_TEXT, DONATION_TEXT, DONATION_REQ, WALLETS
+    from constants import CREATE_ORDER_TEXT, DONATION_TEXT, DONATION_REQ, WALLETS
     from csv_func import WalletCSV
     from utils import Report
 else:
-    from .constants import XRPL_FOUNDATION, CREATE_ORDER_TEXT, DONATION_TEXT, DONATION_REQ, WALLETS
+    from .constants import CREATE_ORDER_TEXT, DONATION_TEXT, DONATION_REQ, WALLETS
     from .csv_func import WalletCSV
     from .utils import Report
 
@@ -35,7 +35,7 @@ debug = True if args.debug else False
 
 
 colorama_init()
-XRP_MAIN_CLIENT = JsonRpcClient(XRPL_FOUNDATION)
+xrpy = XRPY()
 report = Report()
 
 
@@ -69,8 +69,8 @@ def random_round_point(num: float) -> int:
     return randint(min_rand, max_rand)
 
 
-def get_trustline_balance(client: JsonRpcClient, address: str, currency: str) -> Union[float, int]:
-    all_trust_lines = get_account_trustlines(client, address)
+def get_trustline_balance(address: str, currency: str) -> Union[float, int]:
+    all_trust_lines = xrpy.get_account_trustlines(address)
     lines = all_trust_lines.result.get('lines')
 
     for line in lines:
@@ -82,11 +82,11 @@ def get_trustline_balance(client: JsonRpcClient, address: str, currency: str) ->
     return 0
 
 
-def mass_create_order_buy(path_to_csv: str, min_taker_gets_xrp: Union[int, float], max_taker_gets_xrp: Union[int, float],
-                          taker_pays_currency: str,
-                          taker_pays_value: str, taker_pays_issuer: str, side: str,
-                          min_sleep_time: int = 0, max_sleep_time: int = 0, __debug: bool = False):
-
+def mass_create_order_buy(
+        path_to_csv: str, min_taker_gets_xrp: Union[int, float], max_taker_gets_xrp: Union[int, float],
+        taker_pays_currency: str, taker_pays_value: str, taker_pays_issuer: str, side: str,
+        min_sleep_time: int = 0, max_sleep_time: int = 0, __debug: bool = False
+):
     print(
         colored(
             text=f'{path_to_csv=}\n'
@@ -123,8 +123,7 @@ def mass_create_order_buy(path_to_csv: str, min_taker_gets_xrp: Union[int, float
         print(colored(text=f'{taker_gets_xrp=}', color='cyan'))
 
         try:
-            _create_offer = create_offer_buy(
-                XRP_MAIN_CLIENT,
+            _create_offer = xrpy.create_buy_offer(
                 wallet,
                 taker_gets_xrp,
                 taker_pays_currency,
@@ -161,10 +160,11 @@ def mass_create_order_buy(path_to_csv: str, min_taker_gets_xrp: Union[int, float
             continue
 
 
-def mass_create_order_sell(path_to_csv: str, min_taker_pays_xrp: Union[int, float], max_taker_pays_xrp: Union[int, float],
-                           taker_gets_currency: str, taker_gets_value: Union[int, float], percentage: Union[int, float],
-                           taker_gets_issuer: str, side: str,
-                           min_sleep_time: int = 0, max_sleep_time: int = 0, __debug: bool = False):
+def mass_create_order_sell(
+        path_to_csv: str, min_taker_pays_xrp: Union[int, float], max_taker_pays_xrp: Union[int, float],
+        taker_gets_currency: str, taker_gets_value: Union[int, float], percentage: Union[int, float],
+        taker_gets_issuer: str, side: str, min_sleep_time: int = 0, max_sleep_time: int = 0, __debug: bool = False
+):
 
     print(
         colored(
@@ -200,7 +200,7 @@ def mass_create_order_sell(path_to_csv: str, min_taker_pays_xrp: Union[int, floa
             continue
 
         try:
-            balance = get_trustline_balance(XRP_MAIN_CLIENT, wallet.classic_address, taker_gets_currency)
+            balance = get_trustline_balance(wallet.classic_address, taker_gets_currency)
             print(colored(text=f'{balance=}', color='cyan'))
         except Exception as e:
             report.add_failed()
@@ -220,8 +220,7 @@ def mass_create_order_sell(path_to_csv: str, min_taker_pays_xrp: Union[int, floa
 
         try:
             if balance and balance > 0:
-                _create_offer = create_offer_sell(
-                    XRP_MAIN_CLIENT,
+                _create_offer = xrpy.create_sell_offer(
                     wallet,
                     taker_pays_xrp,
                     taker_gets_currency,
@@ -330,7 +329,7 @@ def enter(__debug: bool = False):
             )
             print_end_report()
 
-        except KeyboardInterrupt as e:
+        except KeyboardInterrupt:
             print_end_report()
 
     elif side.lower() == 'sell':
@@ -387,7 +386,7 @@ def enter(__debug: bool = False):
             )
             print_end_report()
 
-        except KeyboardInterrupt as e:
+        except KeyboardInterrupt:
             print_end_report()
 
     else:

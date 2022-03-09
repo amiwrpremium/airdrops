@@ -9,15 +9,15 @@ import traceback
 from colorama import init as colorama_init
 from termcolor import colored
 
-from xrpy import JsonRpcClient, get_account_info, get_reserved_balance
+from xrpy import XRPY
 
 
 if __name__ == '__main__':
-    from constants import XRPL_FOUNDATION, WALLET_BALANCE_TEXT, DONATION_TEXT, DONATION_REQ, WALLETS
+    from constants import WALLET_BALANCE_TEXT, DONATION_TEXT, DONATION_REQ, WALLETS
     from csv_func import WalletCSV
     from utils import Report, Balance
 else:
-    from .constants import XRPL_FOUNDATION, WALLET_BALANCE_TEXT, DONATION_TEXT, DONATION_REQ, WALLETS
+    from .constants import WALLET_BALANCE_TEXT, DONATION_TEXT, DONATION_REQ, WALLETS
     from .csv_func import WalletCSV
     from .utils import Report, Balance
 
@@ -29,7 +29,7 @@ debug = True if args.debug else False
 
 
 colorama_init()
-XRP_TEST_CLIENT = JsonRpcClient(XRPL_FOUNDATION)
+xrpy = XRPY()
 report = Report()
 balance_report = Balance()
 
@@ -67,10 +67,10 @@ def get_wallet_balance(wallet_address: str) -> Dict:
         'reserved': 0,
         'total': 0,
     }
-    account_info = get_account_info(XRP_TEST_CLIENT, wallet_address)
+    account_info = xrpy.get_account_info(wallet_address)
 
     balance = float(account_info.result.get('account_data', {}).get('Balance', 0)) or 0
-    reserved_balance = get_reserved_balance(XRP_TEST_CLIENT, wallet_address, True)
+    reserved_balance = xrpy.get_reserved_balance(wallet_address, True)
 
     total = round((balance / 1000000), 2)
     reserved = round(reserved_balance, 2) if reserved_balance else 0

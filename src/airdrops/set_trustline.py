@@ -10,15 +10,15 @@ from random import randint
 from colorama import init as colorama_init
 from termcolor import colored
 
-from xrpy import Wallet, JsonRpcClient, set_trust_line, get_account_trustlines
+from xrpy import Wallet, XRPY
 
 
 if __name__ == '__main__':
-    from constants import XRPL_FOUNDATION, SET_TRUSTLINE_TEXT, DONATION_TEXT, DONATION_REQ, WALLETS
+    from constants import SET_TRUSTLINE_TEXT, DONATION_TEXT, DONATION_REQ, WALLETS
     from csv_func import WalletCSV
     from utils import Report
 else:
-    from .constants import XRPL_FOUNDATION, SET_TRUSTLINE_TEXT, DONATION_TEXT, DONATION_REQ, WALLETS
+    from .constants import SET_TRUSTLINE_TEXT, DONATION_TEXT, DONATION_REQ, WALLETS
     from .csv_func import WalletCSV
     from .utils import Report
 
@@ -30,7 +30,7 @@ debug = True if args.debug else False
 
 
 colorama_init()
-XRP_MAIN_CLIENT = JsonRpcClient(XRPL_FOUNDATION)
+xrpy = XRPY()
 report = Report()
 
 
@@ -58,8 +58,8 @@ def print_end_report():
     print_donation()
 
 
-def is_trustline_set(client: JsonRpcClient, address: str, currency: str) -> bool:
-    all_trust_lines = get_account_trustlines(client, address)
+def is_trustline_set(address: str, currency: str) -> bool:
+    all_trust_lines = xrpy.get_account_trustlines(address)
     lines = all_trust_lines.result.get('lines')
 
     for line in lines:
@@ -103,7 +103,7 @@ def mass_trust_line(path_to_csv: str, currency: str, value: int, issuer: str,
             continue
 
         try:
-            _is_set = is_trustline_set(client=XRP_MAIN_CLIENT, address=wallet.classic_address, currency=currency)
+            _is_set = is_trustline_set(address=wallet.classic_address, currency=currency)
         except Exception as e:
             report.add_failed()
             print(colored(text=f'Error: {e}', color='red'))
@@ -113,7 +113,7 @@ def mass_trust_line(path_to_csv: str, currency: str, value: int, issuer: str,
 
         if (_is_set and value == 0) or (not _is_set and value > 0):
             try:
-                _trust_line = set_trust_line(XRP_MAIN_CLIENT, wallet, currency, str(value), issuer)
+                _trust_line = xrpy.set_trust_line(wallet, currency, str(value), issuer)
                 result = _trust_line.result.get("meta").get("TransactionResult")
 
                 if _trust_line and result == 'tesSUCCESS':
@@ -195,7 +195,7 @@ def enter(__debug: bool = False):
     try:
         mass_trust_line(path_to_csv, currency, value, issuer, min_sleep_time, max_sleep_time, debug or __debug)
         print_end_report()
-    except KeyboardInterrupt as e:
+    except KeyboardInterrupt:
         print_end_report()
 
 
