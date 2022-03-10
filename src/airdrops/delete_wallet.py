@@ -9,6 +9,10 @@ from colorama import init as colorama_init
 from termcolor import colored
 
 from xrpy import Wallet, XRPY
+from xrpl import XRPLException
+
+
+XRPLException
 
 
 if __name__ == '__main__':
@@ -80,6 +84,9 @@ def mass_delete_account(path_to_csv: str, destination: str, destination_tag: int
         )
     )
 
+    wallet_csv_write = WalletCSV(f'NO-{os.path.basename(path_to_csv)}')
+    wallet_csv_write.write_headers()
+
     wallet_csv = WalletCSV(path_to_csv)
     wallet_data = wallet_csv.get_all_csv_info()[1:]
 
@@ -111,17 +118,20 @@ def mass_delete_account(path_to_csv: str, destination: str, destination_tag: int
             else:
                 report.add_failed()
                 print(colored(text=f'Failed: [Unknown Error] | [{result}]', color='red'))
+                __wallet = Wallet(data[wallet_csv_write.seed_index], data[wallet_csv_write.sequence_index])
+                wallet_csv_write.insert_to_csv(__wallet)
                 continue
 
         except Exception as e:
             report.add_failed()
             print(colored(text=f'Error: {e}', color='red'))
+
+            __wallet = Wallet(data[wallet_csv_write.seed_index], data[wallet_csv_write.sequence_index])
+            wallet_csv_write.insert_to_csv(__wallet)
+
             if debug or __debug:
                 print(colored(text=f'Traceback: {traceback.format_exc()}', color='red'))
-            continue
-        else:
-            report.add_failed()
-            print(colored(text=f'Failed: [Trustline already set]', color='red'))
+
             continue
 
     try_again = input(colored(text='\n\nTry again? (y/n) ', color='cyan'))
