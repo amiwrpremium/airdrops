@@ -31,7 +31,7 @@ debug = True if args.debug else False
 
 
 colorama_init()
-xrpy = XRPY()
+xrpy = XRPY('https://s1.ripple.com:51234/')
 report = Report()
 
 
