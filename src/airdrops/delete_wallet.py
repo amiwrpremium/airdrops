@@ -30,7 +30,7 @@ args = parser.parse_args()
 debug = True if args.debug else False
 
 colorama_init()
-xrpy = XRPY('https://s1.ripple.com:51234/')
+xrpy = XRPY('https://s2.ripple.com:51234/')
 report = Report()
 
 
